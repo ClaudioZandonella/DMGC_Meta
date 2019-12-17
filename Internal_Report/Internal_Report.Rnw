@@ -1,0 +1,176 @@
+
+%%%%% Basic packages  %%%%%%%%
+\documentclass{article}  
+\usepackage[T1] {fontenc} 		  % Font encoding
+\usepackage [utf8] {inputenc}		% Encoding for the document
+\usepackage{a4wide}             % Wider layout
+\usepackage[english]{babel}      
+
+
+%%%%  Packages for using Kable Extra  %%%%
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+
+
+%%%% Other packages  %%%%
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{csquotes}
+\usepackage{setspace} % line spacing
+\setstretch{1.5}
+\usepackage{enumitem}  % for bold enumerate
+\setlist[enumerate]{font=\bfseries}
+\usepackage[labelfont=bf]{caption}  % caption
+\usepackage[style=apa,backend=biber]{biblatex}  % bibliografia
+\addbibresource{DMGC_Meta.bib}
+
+\renewenvironment{knitrout}{\renewcommand{\baselinestretch}{1}}{} % sett line spacing for knitr output
+\usepackage{hyperref}
+
+%%%%%%%%%%%%%%%%%%%%%%          Settings        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<<settings, echo=FALSE, include=F>>=
+  
+rm(list=ls())
+
+# Directories
+main_directory<-""
+data_directory<-"~/Dottorato/Lavori/DMGC_Meta/"
+
+system (paste ("biber", sub ("\\.Rnw$", "", current_input())))
+
+library(metafor)
+library(robumeta)
+library(ggplot2)
+library(kableExtra)
+library(tidyverse)
+
+# Knitr settings
+knitr::opts_chunk$set(echo = FALSE, dev = "tikz", dev.args=list(pointsize=10))
+knitr::opts_knit$set(out.format = "latex")
+thm=knit_theme$get("bclear")
+knitr::knit_theme$set(thm)
+
+
+options(knitr.kable.NA = '')
+
+## ggplot settings
+theme_set(theme_classic()+
+          theme(text = element_text(size=12)))
+@
+  
+  
+% Document title info
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%         Title           %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Title
+\begin{titlepage}
+
+\centering
+	\vspace*{2cm}
+	{\LARGE Multiple outcomes in Meta-Analysis:\\
+	a comparison between robust variance estimation, multilevel meta-analysis, and averaging effect sizes}\\
+	\vspace{1cm}
+	{\Large Claudio Zandonella Callegher\par}
+  \vspace{1cm}
+  {University of Padova\\
+  Department of Developmental Psychology and Socialization\par}
+	\vspace{2.5cm}
+	{\huge\bfseries Internal Report\par}
+	\vspace{1cm}
+	\vfill
+	e-mail addresses\par
+	\href{mailto:claudio.zandonella@gmail.com}{claudiozandonella@gmail.com}
+
+	\vfill
+
+% Bottom of the page
+	{\large \today\par}
+	
+	\vspace{2cm}
+
+\newpage
+
+\clearpage
+\pagenumbering{Roman} 
+
+
+\tableofcontents
+
+\newpage
+
+\listoffigures
+\listoftables
+
+\end{titlepage}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%      Introduction       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}
+\section{Introduction}
+
+\vspace{1em}
+
+In this report we consider the common problem encontered in Meta-Analysis when studies report more than one single effect-size. Common approachs to Meta-Analysis assume independence between effect sizes, so each study should contribute with only one effect size. Howevere, this assumption is violated when studies report more than one effect because multiple effects within a study are not independent. Studies may have measured multiple outcome on the same subjects or multiple effects could have been computed considering the same control group (i.e., evaluationg the effects of two different treatments using the same control group). Even when the different outcomes were evaluated on independent subjects within a study, effects can not be considered truly independent as they are related by other aspects that characterize the study such as instruments and methods used, geographic area, or research group. 
+
+In oreder to take into account the dependency between effect sizes, different approaches are proposed \parencite{pigottMethodologicalGuidancePapers2019,moeyaertMethodsDealingMultiple2017}:
+\begin{enumerate}
+    \item{averaging effect sizes}
+    \item{robust variance estimation}
+    \item{multilevel meta-analysis}
+\end{enumerate}
+
+In the present work we briefly describe these approaches and evaluate the possibly different results they give. We consider as a case study a meta-analysis that evaluates the effect of computer based intervention on children attitude and motivation towards mathematics.
+The present report is divided into different section:
+\begin{itemize}
+    \item{\textbf{Section \ref{Theoretical_Aspects}:} The theoretical aspects and implication of the three methods are briefly presented}
+\end{itemize}
+\vspace{1em}
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%    Theoretical Aspects   %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Theoretical Aspects} \label{Theoretical_Aspects}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%    Session Information   %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Session Information}
+
+<<Session Info, echo=T>>=
+  sessionInfo(package = NULL)
+@
+  
+\newpage
+
+\phantomsection 
+\addcontentsline{toc}{section}{Bibliography}
+\printbibliography
+
+\end{document}
+
+
+\end{document}
