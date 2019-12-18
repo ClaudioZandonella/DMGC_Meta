@@ -8,11 +8,12 @@
 rm(list=ls())
 setwd(dirname(rstudioapi::getSourceEditorContext()$path)) # setting wd to file location
 
+library(tidyverse)
 library(metafor)
 library(clubSandwich)
-library(tidyverse)
 library(knitr)
 library(kableExtra)
+
 
 set.seed(2019)
 theme_set(theme_bw())
