@@ -86,6 +86,13 @@
       "Repository": "CRAN",
       "Hash": "543776ae6848fde2f48ff3816d0628bc"
     },
+    "base64url": {
+      "Package": "base64url",
+      "Version": "1.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "0c54cf3a08cc0e550fbd64ad33166143"
+    },
     "broom": {
       "Package": "broom",
       "Version": "0.5.2",
@@ -177,6 +184,13 @@
       "Repository": "CRAN",
       "Hash": "c426258a806b7e69613432b197b9954d"
     },
+    "drake": {
+      "Package": "drake",
+      "Version": "7.8.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "eac83dedaa90a04e21c40af828aea40a"
+    },
     "ellipsis": {
       "Package": "ellipsis",
       "Version": "0.3.0",
@@ -197,6 +211,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "b31d9e5d051553d1177083aeba04b5b9"
+    },
+    "filelock": {
+      "Package": "filelock",
+      "Version": "1.0.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "38ec653c2613bed60052ba3787bd8a2c"
     },
     "forcats": {
       "Package": "forcats",
@@ -232,6 +253,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "d4e25697c450c01b202c79ef35694a83"
+    },
+    "gridExtra": {
+      "Package": "gridExtra",
+      "Version": "2.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "7d7f283939f563670a697165b2cf5560"
     },
     "gtable": {
       "Package": "gtable",
@@ -274,6 +302,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "7146fea4685b4252ebf478978c75f597"
+    },
+    "igraph": {
+      "Package": "igraph",
+      "Version": "1.2.4.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "12eccd39a9fe9fd7a805b40fc0b7d01f"
     },
     "jsonlite": {
       "Package": "jsonlite",
@@ -485,13 +520,6 @@
       "Repository": "CRAN",
       "Hash": "c66b930d20bb6d858cd18e1cebcfae5c"
     },
-    "renv": {
-      "Package": "renv",
-      "Version": "0.9.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "5181d5f316c7a6589219866d640e004c"
-    },
     "reprex": {
       "Package": "reprex",
       "Version": "0.3.0",
@@ -555,6 +583,13 @@
       "Repository": "CRAN",
       "Hash": "5ed4ef04d145af4c2bf651d94ba3d7fe"
     },
+    "storr": {
+      "Package": "storr",
+      "Version": "1.2.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "0a3635220b58f2c2faccd78e97b0cafd"
+    },
     "stringi": {
       "Package": "stringi",
       "Version": "1.4.3",
@@ -610,6 +645,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "a14f7f9c8edc600abe43ef359b733ddb"
+    },
+    "txtq": {
+      "Package": "txtq",
+      "Version": "0.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "92e5a36ad5b445e895a0f9b98db4d810"
     },
     "utf8": {
       "Package": "utf8",

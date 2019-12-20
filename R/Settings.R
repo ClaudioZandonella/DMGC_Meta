@@ -4,16 +4,35 @@
 ################################
 
 #----     R packages   ----
-library(conflicted)
-library(tidyverse)
-library(metafor)
-library(clubSandwich)
-library(knitr)
-library(kableExtra)
-library(drake)
+
+packages_list <- c("conflicted",
+                   "tidyverse",
+                   "metafor",
+                   "clubSandwich",
+                   "knitr",
+                   "kableExtra",
+                   "drake",
+                   "gridExtra")
+
+# load packages
+lapply(packages_list,require, character.only = TRUE)
 
 
-# renv::hydrate("drake")
+#----    Procedure to remove packages   -----
+# ip <- as.data.frame(installed.packages())
+# ip <- subset(ip, !grepl("MRO", ip$LibPath))
+# ip <- ip[!(ip[,"Priority"] %in% c("base", "recommended")),]
+# path.lib <- unique(ip$LibPath)
+# pkgs.to.remove <- ip[,1]
+# 
+# sapply(pkgs.to.remove, renv::remove, lib = path.lib)
+
+#----    renv comands    ----
+
+# renv::purge()
+# renv::hydrate("renv")
+# renv::remove()
+# renv::snapshot()
 
 #---- function conflicts   ----
 
