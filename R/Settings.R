@@ -12,7 +12,9 @@ packages_list <- c("conflicted",
                    "knitr",
                    "kableExtra",
                    "drake",
-                   "gridExtra")
+                   "gridExtra",
+                   "MAd",
+                   "visNetwork")
 
 # load packages
 lapply(packages_list,require, character.only = TRUE)
@@ -30,7 +32,7 @@ lapply(packages_list,require, character.only = TRUE)
 #----    renv comands    ----
 
 # renv::purge()
-# renv::hydrate("renv")
+# renv::hydrate(packages_list)
 # renv::remove()
 # renv::snapshot()
 

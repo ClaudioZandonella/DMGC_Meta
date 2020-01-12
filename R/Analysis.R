@@ -18,7 +18,7 @@ vis_drake_graph(config, font_size = 16, targets_only = T)
 
 #----    Make    ----
 
-# clean(destroy = TRUE)
+# drake::clean(destroy = TRUE)
 make(plan)
 
 
