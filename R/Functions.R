@@ -28,7 +28,8 @@ munge_data <- function(data){
     # Redefine factor labels for grade and device
     mutate(grade=recode_factor(grade,"1"="Primary","2"="Secondary"),
            device=recode_factor(device,"app"="App","con"="Console","pc"="PC"),
-           author_y=paste0(author," (",year,")"))
+           author_y=paste0(author," (",year,")"),
+           intensity = sessions*minutes/weeks)
   #----
   
   # Pareto et al (2011) does not report post-test scores but gain scores (mean and sd)
@@ -445,6 +446,84 @@ sens_summary_plot <- function(sens_summary){
 
 #----    sens_loo_plot    ----
 
+sens_loo_plot <- function(sens_loo_summary, data){
+  
+  sens_loo_summary%>%
+    mutate(author_y = factor(unique(data$author_y), levels = rev(unique(data$author_y))),
+           lab_I_squared=round(I_squared,0),
+           lab_beta=round(beta,2),
+           lab_ci_lb=beta-1.96*SE,
+           lab_ci_ub=beta+1.96*SE,
+           lab_ci=paste0("[",format(round(lab_ci_lb,2),2),
+                         "; ",format(round(lab_ci_ub,2),2),"]"))%>%
+    ggplot()+
+    geom_errorbarh(aes(xmin=beta-1.96*SE, xmax=beta+1.96*SE, y=author_y))+
+    geom_point(aes(x=beta ,y=author_y), size=4)+
+    geom_vline(xintercept=0, linetype=2)+
+    scale_y_discrete(breaks=rev(unique(data$author_y)),
+                     limits=c(rev(unique(data$author_y))," "))+
+    geom_text(aes(x=.50,y=author_y,label=lab_I_squared),size=3)+
+    geom_text(aes(x=.58,y=author_y,label=lab_beta),size=3)+
+    geom_text(aes(x=.64,y=author_y,label=lab_ci),size=3)+
+    geom_text(aes(x=.50,y=20,label="I^2"),size=4)+
+    geom_text(aes(x=.58,y=20,label="dppc2"),size=4)+
+    geom_text(aes(x=.64,y=20,label="95\\%CI"),size=4)+
+    scale_x_continuous(breaks = seq(0,.45, by=.05))+
+    labs(y="Obmitted study",
+         x="Beta coefficient")+
+    theme(panel.grid = element_blank())
+
+  }
+
+#----    sens_cook    ----
+sens_cook <- function(fit_rma_mv){
+  sens_cook = as.data.frame(
+    cooks.distance(fit_rma_mv, cluster = fit_rma_mv$data$study))%>%
+    mutate(author_y=factor(unique(fit_rma_mv$data$author_y), levels=unique(fit_rma_mv$data$author_y)),
+           id=1:19)
+  names(sens_cook)[1]="cooks_distance"
+  
+  return(sens_cook)
+}
+#----    sens_cook_plot    ----
+
+sens_cook_plot <- function(sens_cook_summary){
+  ggplot(sens_cook_summary)+
+    geom_point(aes(x=author_y, y=cooks_distance),size=3)+
+    geom_line(aes(x=id, y=cooks_distance), linetype=1)+
+    theme(axis.text.x = element_text(angle=45,hjust = 1))+
+    labs(x="Study",
+         y="Cook's distance")
+}
+
+
+##################################
+####    Moderator Analysis    ####
+##################################
+#----    rma_multilevel_moderator    ----
+rma_multilevel_mod <- function(data, r_pre_post="r_mediumh", r_outocomes=.5, moderator){
+  data = data%>%
+    filter(r_size==r_pre_post)
+  
+  # compute variance-covariance matrix
+  cov_dppc2 = compute_vcv_matrix(data, r=r_outocomes)
+  
+  # Get mod formula
+  mod_formula = as.formula(paste0("~",moderator))
+  
+  # multilevel meta-analysis
+  mod_rma_mv = rma.mv(yi = yi_dppc2, V = cov_dppc2, random =  ~ 1|study,
+                      mod = mod_formula,
+                      method = "REML", data = data, slab=author_y)
+  
+  mod_rma_mv$I_squared = I_squared(mod_rma_mv)
+  mod_rma_mv$coef_test = coef_test(mod_rma_mv, cluster = data$study, vcov = "CR2")
+  mod_rma_mv$r_pre_post=r_pre_post
+  mod_rma_mv$r_outocomes=r_outocomes
+  mod_rma_mv$data = data
+  
+  return(mod_rma_mv)
+}
 
 #-------------
 

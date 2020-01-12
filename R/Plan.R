@@ -101,8 +101,31 @@ plan <- drake_plan(
     transform = combine(summary_sens_loo) 
   ),
   
+  # Plot summary sensitivity loo
+  plot_sens_loo = sens_loo_plot(sens_loo_summary, data),
+  
   # Cook distances
-  sens_loo_cook = cooks.distance(fit_rma_mv, cluster = fit_rma_mv$data$study)
+  sens_cook_summary = sens_cook(fit_rma_mv),
+  
+  # Cook plot
+  plot_cook=sens_cook_plot(sens_cook_summary),
+  
+  
+  #----    Moderator-Analysis    ----
+  
+  # Fit separate multilevel meta-analysis for each moderator
+  mod_rma_mv = target(
+    rma_multilevel_mod(data,r_pre_post="r_mediumh",r_outocomes=.5,
+                       moderator = moderator_value),
+    # Define an analysis target for each moderator
+    transform = map(moderator_value=c("pub","grade","weeks","intensity",
+                                      "device", "mot")
+    )),
+  
+  # Test of moderator
+  test = target(
+    anova(mod_rma_mv),
+    transform = map(mod_rma_mv))
   
   )
 

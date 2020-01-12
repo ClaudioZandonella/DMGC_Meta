@@ -20,35 +20,17 @@ vis_drake_graph(config, font_size = 16, targets_only = T)
 # clean(destroy = TRUE)
 make(plan)
 
-readd(data)
+
 loadd(data)
-
-readd(table_freq_grade)
-readd(table_freq_pub)
-readd(table_freq_weeks)
-readd(plot_effects_participants)
-readd(table_freq_mot)
-
-readd(fit_rma_mv)
 loadd(fit_rma_mv)
+loadd(mod_rma_mv_pub)
+loadd(mod_rma_mv_grade)
+loadd(mod_rma_mv_weeks)
+loadd(mod_rma_mv_intensity)
+loadd(mod_rma_mv_device)
+loadd(mod_rma_mv_mot)
 
-fitloadd(plot_forest)
-readd(plot_forest)
-
-summary(fit_rma_mv)
-fit_rma_mv$coef_test
-fit_rma_mv$I_squared
-
-drake_config(plan)$seed
-
-
-
-loadd(sens_loo_summary)
-loadd(sens_summary)
-readd(plot_sens_summary)
-
-matrixcalc::is.positive.definite(v)
-
+AIC(mod_rma_mv_mot,fit_rma_mv)
 #-------
 
 
