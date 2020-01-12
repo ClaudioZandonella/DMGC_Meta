@@ -14,6 +14,7 @@ source("R/Auxiliary_functions.R") # Auxiliary functions
 
 config <- drake_config(plan)
 vis_drake_graph(config, font_size = 16, targets_only = T)
+#drake_ggraph(config, targets_only = T)
 
 #----    Make    ----
 
@@ -30,6 +31,10 @@ loadd(mod_rma_mv_intensity)
 loadd(mod_rma_mv_device)
 loadd(mod_rma_mv_mot)
 
+loadd(egger_regression_N)
+loadd(egger_regression_vi_dppc2)
+
+sqrt(data$vi_dppc2)
 AIC(mod_rma_mv_mot,fit_rma_mv)
 #-------
 

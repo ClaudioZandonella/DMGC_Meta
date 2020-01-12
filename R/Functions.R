@@ -3,8 +3,6 @@
 ####    Functions    ####
 #########################
 
-
-
 ################################
 ####    Data preparation    ####
 ################################
@@ -29,7 +27,8 @@ munge_data <- function(data){
     mutate(grade=recode_factor(grade,"1"="Primary","2"="Secondary"),
            device=recode_factor(device,"app"="App","con"="Console","pc"="PC"),
            author_y=paste0(author," (",year,")"),
-           intensity = sessions*minutes/weeks)
+           intensity = sessions*minutes/weeks)%>%
+    select("study":"minutes","intensity",everything())
   #----
   
   # Pareto et al (2011) does not report post-test scores but gain scores (mean and sd)
@@ -131,6 +130,33 @@ rm_hung <- function(data){
   #----
   return(data)
 }
+
+#----    data_aggregated    ----
+
+aggregate_data = function (data, r_pre_post="r_mediumh", cor=.5,
+                           method="BHHR"){
+  selected_data = data%>%
+    filter(r_size==r_pre_post)
+  
+  agg_effects = MAd::agg(id = study, es = yi_dppc2, var = vi_dppc2,
+                         cor=cor, n.1=n_eg, n.2=n_cg, 
+                         method=method, data=selected_data)
+  
+  data_aggregated = selected_data%>%
+    group_by(study)%>%
+    mutate(N=round(mean(N),0),
+           n_cg=round(mean(n_cg),0),
+           n_eg=round(mean(n_eg),0))%>%
+    filter(!duplicated(study))%>%
+    left_join(.,agg_effects, by= "id")%>%
+    mutate(yi_dppc2=es,
+           vi_dppc2=var)%>%
+    select("study":"n_eg","author_y","yi_dppc2":"vi_dppc2")
+  
+  return(data_aggregated)
+}
+
+
 
 
 ######################################
@@ -260,6 +286,7 @@ freq_table_mot <- function(data){
 
 
 
+
 #############################
 ####    Meta Analysis    ####
 #############################
@@ -294,7 +321,7 @@ compute_vcv_matrix <- function(data, r=.5){
 
 #----    rma_multilevel    ----
 
-rma_multilevel <-  function(data, r_pre_post="r_mediumh", r_outocomes=.5, excluded_study=NULL){
+rma_multilevel <-  function(data, r_pre_post="r_mediumh", r_outocomes=.5, excluded_study=NULL, moderator=NULL){
   data = data%>%
     filter(r_size==r_pre_post)
   
@@ -308,9 +335,16 @@ rma_multilevel <-  function(data, r_pre_post="r_mediumh", r_outocomes=.5, exclud
       filter(study!=excluded_study)
   }
   
+  # Get mod formula
+  if (is.null(moderator)){
+    mod_formula = NULL
+  }else{
+    mod_formula = as.formula(paste0("~",moderator))
+  }
+  
   # multilevel meta-analysis
   fit_rma_mv = rma.mv(yi = yi_dppc2, V = cov_dppc2, random =  ~ 1|study, 
-                      method = "REML", data = data, slab=author_y)
+                      mod = mod_formula, method = "REML", data = data, slab=author_y)
   
   fit_rma_mv$I_squared = I_squared(fit_rma_mv)
   fit_rma_mv$coef_test = coef_test(fit_rma_mv, cluster = data$study, vcov = "CR2")
@@ -351,6 +385,7 @@ forest_plot <- function(fit_rma_mv){
   
   return(p)
 }
+
 
 ########################################
 ####    Sensitivity correlations    ####
@@ -440,6 +475,7 @@ sens_summary_plot <- function(sens_summary){
 }
 
 
+
 #########################################
 ####    Sensitivity leave-one-out    ####
 #########################################
@@ -497,33 +533,32 @@ sens_cook_plot <- function(sens_cook_summary){
 }
 
 
+
 ##################################
 ####    Moderator Analysis    ####
 ##################################
-#----    rma_multilevel_moderator    ----
-rma_multilevel_mod <- function(data, r_pre_post="r_mediumh", r_outocomes=.5, moderator){
-  data = data%>%
-    filter(r_size==r_pre_post)
-  
-  # compute variance-covariance matrix
-  cov_dppc2 = compute_vcv_matrix(data, r=r_outocomes)
-  
-  # Get mod formula
-  mod_formula = as.formula(paste0("~",moderator))
-  
-  # multilevel meta-analysis
-  mod_rma_mv = rma.mv(yi = yi_dppc2, V = cov_dppc2, random =  ~ 1|study,
-                      mod = mod_formula,
-                      method = "REML", data = data, slab=author_y)
-  
-  mod_rma_mv$I_squared = I_squared(mod_rma_mv)
-  mod_rma_mv$coef_test = coef_test(mod_rma_mv, cluster = data$study, vcov = "CR2")
-  mod_rma_mv$r_pre_post=r_pre_post
-  mod_rma_mv$r_outocomes=r_outocomes
-  mod_rma_mv$data = data
-  
-  return(mod_rma_mv)
-}
+
+# For moderator analysis the rma_multilevel() function was used setting moderator = "" option
+
+
+################################
+####    Publication Bias    ####
+################################
+
+# selected_data <- data%>%
+#   filter(r_size=="r_mediumh")
+# 
+# ex1 <- MAd::agg(id = study, es = yi_dppc2, var = vi_dppc2, cor=.5, 
+#          method="BHHR", data=selected_data)
+# 
+# ex2 <- MAd::agg(id = study, es = yi_dppc2, var = vi_dppc2, cor=.5,
+#                 n.1=n_eg, n.2=n_cg,
+#                 method="GO1", data=selected_data)
+# 
+# agg_meta <- rma(yi=es,vi=var, data=ex1)
+# rma(yi=es,vi=var, data=ex1)
+# rma(yi=es1,vi=var1, data=ex2)
+
 
 #-------------
 

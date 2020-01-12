@@ -35,11 +35,12 @@ lapply(packages_list,require, character.only = TRUE)
 # renv::snapshot()
 
 #---- function conflicts   ----
+# conflict_scout()
 
 conflict_prefer("filter", "dplyr")
 conflict_prefer("gather", "tidyr")
 
-# conflict_scout()
+
 
 #-----    ggplot2 settings    ----
 theme_set(theme_bw())

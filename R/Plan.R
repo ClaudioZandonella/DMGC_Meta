@@ -51,6 +51,16 @@ plan <- drake_plan(
   
   plot_forest = forest_plot(fit_rma_mv),
   
+  #----    Meta-analysis data_aggregated    ----
+  
+  # Obtain data with aggregate effect size using MAd::agg function
+  # and setting method="BHHR" raccomanded by Hoyt & Del Re (2017)
+  data_aggregated = aggregate_data(data, cor = .5, method = "BHHR"),
+  
+  # Random-effect meta-analysis
+  fit_rma = rma(yi = yi_dppc2, vi = vi_dppc2, method = "REML",
+                data = data_aggregated, slab = author_y),
+  
   #----    Sensitivity correlations    ----
   
   # Compute all possible combinations
@@ -115,7 +125,7 @@ plan <- drake_plan(
   
   # Fit separate multilevel meta-analysis for each moderator
   mod_rma_mv = target(
-    rma_multilevel_mod(data,r_pre_post="r_mediumh",r_outocomes=.5,
+    rma_multilevel(data,r_pre_post="r_mediumh",r_outocomes=.5,
                        moderator = moderator_value),
     # Define an analysis target for each moderator
     transform = map(moderator_value=c("pub","grade","weeks","intensity",
@@ -125,8 +135,31 @@ plan <- drake_plan(
   # Test of moderator
   test = target(
     anova(mod_rma_mv),
-    transform = map(mod_rma_mv))
+    transform = map(mod_rma_mv)),
   
+  
+  #----    Publication-bias    ---- 
+  
+  # Funnel plot
+  funnel_plot = funnel(fit_rma_mv),
+  
+  # Funnel plot aggregated effect with trim-and-fill
+  trim_fill_aggregated = trimfill(fit_rma),
+  
+  funnel_plot_aggregated = funnel(trim_fill_aggregated),
+  
+  # Egger's regression test considering study sample size or 
+  # variance effect as predictors
+  
+  egger_regression = target(
+    rma_multilevel(data, r_pre_post = "r_mediumh",r_outocomes = .5,
+                       moderator = moderator_value),
+    # Define an analysis target for each moderator
+    transform = map(moderator_value = c("N", "vi_dppc2"))
+  )
+  #---- 
+
+
   )
 
 
