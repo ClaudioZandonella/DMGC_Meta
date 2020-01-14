@@ -26,7 +26,7 @@ plan <- drake_plan(
   # Plot n studies according to publication year
   plot_publication_year = publication_year(data),
   
-  # Frequecies studies according to publication, school-grade
+  # Frequencies studies according to publication, school-grade
   table_freq = target(freq_table(data, var_name = ddd),
                       transform = map(ddd=c(pub,grade))),
   
@@ -42,8 +42,8 @@ plan <- drake_plan(
   # Table different motivation outcomes measured
   table_freq_mot = freq_table_mot(data),
   
-  #----    Meta-analysis    ----
-  
+  #----    Multilevel meta-analysis    ----
+
   # model fit
   fit_rma_mv = rma_multilevel(data,r_pre_post="r_mediumh",r_outocomes=.5),
   
@@ -53,17 +53,17 @@ plan <- drake_plan(
   
   #----    Meta-analysis data_aggregated    ----
   
-  # Obtain data with aggregate effect size using MAd::agg function
-  # and setting method="BHHR" raccomanded by Hoyt & Del Re (2017)
+  # Obtain data with aggregate effect sizes using Borenstein formula
   data_aggregated = aggregate_data(data, cor = .5, method = "BHHR"),
   
-  # Random-effect meta-analysis
+  # Random-effect meta-analysis with aggregated effects
   fit_rma = rma(yi = yi_dppc2, vi = vi_dppc2, method = "REML",
                 data = data_aggregated, slab = author_y),
   
   #----    Sensitivity correlations    ----
   
-  # Compute all possible combinations
+  # Fit multilevel meta-analysis wit all possible combinations
+  # of the correlation pre-post test and correlation between outcomes
   sens_fit_rma_mv = target(
     rma_multilevel(data,r_pre_post=r_pre_post_value,r_outocomes=r_outcomes_value),
     # Define an analysis target for each combination of
@@ -79,45 +79,43 @@ plan <- drake_plan(
     transform = map(sens_fit_rma_mv)
   ),
   
-  # Summarize 
+  # Summarize results sensitivity correlations analysis
   sens_summary = target(
     dplyr::bind_rows(summary_sens),
     transform = combine(summary_sens) 
   ),
   
-  # Plot results sensitivity
-  
+  # Plot results sensitivity correlations analysis
   plot_sens_summary = sens_summary_plot(sens_summary),
   
   #----    Sensitivity leave-one-out    ----
   
-  # Compute fit excluding one study at time
+  # Fit multilevel meta-analysis excluding one study at time
   fit_rma_loo = target(
     rma_multilevel(data, excluded_study= excluded_study_value),
-    # Define an analysis target for each combination of
-    # r_pre_post_value and r_outcomes_value.
+    # Define an analysis target for each study removed (excluded_study_value)
     transform = map(excluded_study_value=!!seq(1,19, by=1))
     ),
   
-  # Get results for each combination
+  # Get results for each study removed
   summary_sens_loo = target(
     summarize_fit_rma_mv(fit_rma_loo),
     transform = map(fit_rma_loo)
   ),
   
-  # Summarize 
+  # Summarize results sensitivity loo
   sens_loo_summary = target(
     dplyr::bind_rows(summary_sens_loo),
     transform = combine(summary_sens_loo) 
   ),
   
   # Plot summary sensitivity loo
-  plot_sens_loo = sens_loo_plot(sens_loo_summary, data),
+  plot_sens_loo = sens_loo_plot(sens_loo_summary, fit_rma_mv, data),
   
-  # Cook distances
+  # Cook's distances
   sens_cook_summary = sens_cook(fit_rma_mv),
   
-  # Cook plot
+  #  Plot Cook's distances
   plot_cook=sens_cook_plot(sens_cook_summary),
   
   
@@ -140,10 +138,10 @@ plan <- drake_plan(
   
   #----    Publication-bias    ---- 
   
-  # Funnel plot
+  # Funnel plot multilevel meat-analysis
   funnel_plot = funnel(fit_rma_mv),
   
-  # Funnel plot aggregated effect with trim-and-fill
+  # Funnel plot meta-analysis aggregated effect with trim-and-fill
   trim_fill_aggregated = trimfill(fit_rma),
   
   funnel_plot_aggregated = funnel(trim_fill_aggregated),

@@ -26,20 +26,22 @@ munge_data <- function(data){
     # Redefine factor labels for grade and device
     mutate(grade=recode_factor(grade,"1"="Primary","2"="Secondary"),
            device=recode_factor(device,"app"="App","con"="Console","pc"="PC"),
+           # Obtain authors (year) label
            author_y=paste0(author," (",year,")"),
+           # Compute intensity of the intervention
            intensity = sessions*minutes/weeks)%>%
     select("study":"minutes","intensity",everything())
-  #----
   
-  # Pareto et al (2011) does not report post-test scores but gain scores (mean and sd)
-  # for the two effects:
+  #----- pareto_post -------
+  
+  # Pareto et al (2011) does not report post-test scores but 
+  # gain scores (mean and sd) for the two effects:
   
   # To obtain the post-test scores we have:
   # m_t2_* = m_t1_* + m_gain_*
   # sd_t2_* = sqrt(sd_t1_*^2 + sd_gain_*^2)
-  # Because variances are independent 
-  
-  #----- pareto_post -------
+  # Because variances are independent
+  # (* stands for control group/experimental group)
   
   # Control group
   m_gain_cg<-c(1.5,-.23)    # Mean gain
@@ -83,15 +85,14 @@ compute_dppc2 <- function(data){
   
   # To compute the variance we need the correlation between pre- and post-test scores
   # correlation are not reported so we try with different values
-  # high correlation (around .8), medium-high correlation (around .6),
-  # medium-low correlation (around .4), and low correlation (around .2)
+  # high correlation (.8), medium-high correlation (.6),
+  # medium-low correlation (.4), and low correlation (.2)
   
   #----    compute_vi_dppc2    ----
   
   # Compute vi_dppc2
   
   # add correlations pre-post 
-  set.seed(2020)
   
   data<-data%>%
     mutate(r_high=.8,      # high correlation
@@ -115,13 +116,14 @@ compute_dppc2 <- function(data){
 
 #----    rm_hung function    ----
 
+# We remove the second effect in Hung et al. (2014) because evident problems.
+# In the measure of the pre-test sd is very low (.02 and .00).
+# In turns, this lead to an implausible effect of 38
+# That is probably given by the fact that the measure used was not able to
+# evaluate properly the variation among individuals (floor effect)
+
 rm_hung <- function(data){
-  # We remove the second effect in Hung et al. (2014) because evident problems.
-  # In the measure of the pre-test sd is very low (.02 and .00).
-  # In turns, this lead to an implausible effect of 38
-  # That is probably given by the fact that the measure used was not able to
-  # evaluate properly the variation among individuals (floor effect?)
-  
+
   #----    rm_hung    ----
   
   # Remove effect
@@ -133,15 +135,21 @@ rm_hung <- function(data){
 
 #----    data_aggregated    ----
 
+# Obtain dataset with aggregate effects within studies 
+# using MAd::agg function and setting method="BHHR" raccomanded by 
+# Hoyt & Del Re (2017): https://doi.org/10.1080/10503307.2017.1405171
+
 aggregate_data = function (data, r_pre_post="r_mediumh", cor=.5,
                            method="BHHR"){
   selected_data = data%>%
     filter(r_size==r_pre_post)
   
+  # Aggregate effects
   agg_effects = MAd::agg(id = study, es = yi_dppc2, var = vi_dppc2,
                          cor=cor, n.1=n_eg, n.2=n_cg, 
                          method=method, data=selected_data)
   
+  # Arrenge dataset to keep only useful variables
   data_aggregated = selected_data%>%
     group_by(study)%>%
     mutate(N=round(mean(N),0),
@@ -163,9 +171,11 @@ aggregate_data = function (data, r_pre_post="r_mediumh", cor=.5,
 ####    Descriptive Statistics    ####
 ######################################
 
-####    Studies level    ####
+####    Study level    ####
 
 #----    table_n_studies_effects    ----
+
+# Obtain the frequency table of number of effects for studies
 
 n_effects_studies <- function(data){
   data%>%
@@ -178,6 +188,8 @@ n_effects_studies <- function(data){
 }
 
 #----    plot_publication_year    ----
+
+# Plot the frequency of studies by year
 
 publication_year <- function(data){
   data%>%
@@ -192,7 +204,9 @@ publication_year <- function(data){
 
 #----    freq_table    ----
 
-#  Used for publication, school-grade 
+# Frequency table of studies in given level of variable 
+# Used for publication, school-grade 
+
 freq_table <- function(data, var_name){
   var_name = enquo(var_name)
   data%>%
@@ -204,7 +218,9 @@ freq_table <- function(data, var_name){
 
 #----    freq_table_weeks   ----
 
-#  Used for publication, school-grade 
+# Frequency table of studies in given level of variable
+#  Used for weeks 
+
 freq_table_weeks <- function(data){
   data%>%
     filter(!duplicated(id))%>%
@@ -218,15 +234,17 @@ freq_table_weeks <- function(data){
 
 #----    plot_participants_studies -----
 
+# Plot number of participants for each study
+
 participants_studies <- function(data){
   # Compute the total number of participants in 
-  # Ke(2006)
+  # Ke(2006) - independent groups
   N_ke2006 = data%>%
     filter(id=="961" & !duplicated(id_effect))%>%
     select(n_cg,n_eg)%>%
     sum()
   
-  # Ke(2008)
+  # Ke(2008) - multiple experimental groups 
   N_ke2008 = data%>%
     filter(id=="432" & !duplicated(id_effect))%>%
     select(n_cg,n_eg)%>%
@@ -248,7 +266,11 @@ participants_studies <- function(data){
     
 }
 
+
+####    Effects level    ####
 #----    plot_effects_participants    ----
+
+# Plot effects according to number of subjects
 
 effects_participants <- function(data){
   my_breaks = c(50, 100, 200, 400,1000)
@@ -273,6 +295,9 @@ effects_participants <- function(data){
 
 #----    freq_table_mot    ----
 
+# Frequency table of studies in given level of variable
+#  Used for weeks
+
 freq_table_mot <- function(data){
   data%>%
     filter(!duplicated(id_effect))%>%
@@ -291,10 +316,13 @@ freq_table_mot <- function(data){
 ####    Meta Analysis    ####
 #############################
 
+
 #----    gleser2009    ----
-# function to compute variance-covariance matrix when multiple treatment groups
+
+# Function to compute variance-covariance matrix when multiple treatment groups
 # are compared to the same control group:
-# http://www.metafor-project.org/doku.php/analyses:gleser2009 (section "Quantitative Response Variable")
+# http://www.metafor-project.org/doku.php/analyses:gleser2009
+# (section "Quantitative Response Variable")
 
 calc_vcv <- function(data) {
   Ni <- rep(sum(data$n_eg) + data$n_cg[1], each=nrow(data))
@@ -303,7 +331,11 @@ calc_vcv <- function(data) {
   v
 }
 
-#----    compute_vcv_matrix    ----  
+#----    compute_vcv_matrix    ----
+
+# Compute variance covariance matrix for given correlation value
+# according to the type of dependecy between outcomes
+
 compute_vcv_matrix <- function(data, r=.5){
   
   # Considering all effects correlated
@@ -314,12 +346,19 @@ compute_vcv_matrix <- function(data, r=.5){
   cov_dppc2[[2]] = cov_dppc2[[2]]*diag(1,3,3)
   
   # Effect sizes in Ke (2008) are computed with different treatment group but same control group
-  #cov_dppc2[[3]] = calc_vcv(data[data$study==3,])
+  # Gleser & Olkin (2009) provide formula to compute variance of Cohen's d considering
+  # this dependence (see "gleser2009" section). However, formula are unknown for dppc2.
+  # Thus, Ke (2008) effects are considered correlated as multiple outcomes varying correlation.
+  
+  # To compute values using Gleser & Olkin (2009) formula uncomment the following line
+  # cov_dppc2[[3]] = calc_vcv(data[data$study==3,])
   
   return(cov_dppc2)
 }
 
 #----    rma_multilevel    ----
+
+# Mulitlevel meta-analysis
 
 rma_multilevel <-  function(data, r_pre_post="r_mediumh", r_outocomes=.5, excluded_study=NULL, moderator=NULL){
   data = data%>%
@@ -330,7 +369,9 @@ rma_multilevel <-  function(data, r_pre_post="r_mediumh", r_outocomes=.5, exclud
   
   # check if study have to be excluded (for the sens_loo)
   if(!is.null(excluded_study)){
+    # remove study from variance-covariance matrix
     cov_dppc2 = compute_vcv_matrix(data, r=.5)[-excluded_study]
+    # remove study from data
     data = data%>%
       filter(study!=excluded_study)
   }
@@ -346,6 +387,7 @@ rma_multilevel <-  function(data, r_pre_post="r_mediumh", r_outocomes=.5, exclud
   fit_rma_mv = rma.mv(yi = yi_dppc2, V = cov_dppc2, random =  ~ 1|study, 
                       mod = mod_formula, method = "REML", data = data, slab=author_y)
   
+  # add useful information
   fit_rma_mv$I_squared = I_squared(fit_rma_mv)
   fit_rma_mv$coef_test = coef_test(fit_rma_mv, cluster = data$study, vcov = "CR2")
   fit_rma_mv$r_pre_post=r_pre_post
@@ -357,6 +399,8 @@ rma_multilevel <-  function(data, r_pre_post="r_mediumh", r_outocomes=.5, exclud
 }
 
 #----    forest_plot    ----
+
+# Forest plot multilevel meta-analysis
 
 forest_plot <- function(fit_rma_mv){
   
@@ -393,6 +437,8 @@ forest_plot <- function(fit_rma_mv){
 
 #----    summarize_fit_rma_mv    ----
 
+# summarize info about mulitlevel meta analysis
+
 summarize_fit_rma_mv<- function(fit_rma_mv){
   
   conf_int_sigma = confint(fit_rma_mv)$random[2,]
@@ -426,6 +472,8 @@ summarize_fit_rma_mv<- function(fit_rma_mv){
 }
 
 #----    sens_summary_plot    ----
+
+# Plot summary information about the sensitivity analysis
 
 sens_summary_plot <- function(sens_summary){
   sens_summary = sens_summary%>%
@@ -482,10 +530,17 @@ sens_summary_plot <- function(sens_summary){
 
 #----    sens_loo_plot    ----
 
-sens_loo_plot <- function(sens_loo_summary, data){
+# Plot results of sensitivity leave one out analysis
+
+sens_loo_plot <- function(sens_loo_summary, fit_rma_mv, data, label_I_squared = "I^2",
+                          label_dppc2 = "dppc2", label_ci = "95\\%CI"){
+  
+  # Add original results when all studies are considered
+  original_results = summarize_fit_rma_mv(fit_rma_mv)
   
   sens_loo_summary%>%
-    mutate(author_y = factor(unique(data$author_y), levels = rev(unique(data$author_y))),
+    bind_rows(original_results)%>%
+    mutate(author_y =c(unique(data$author_y),"Original result"),
            lab_I_squared=round(I_squared,0),
            lab_beta=round(beta,2),
            lab_ci_lb=beta-1.96*SE,
@@ -493,17 +548,18 @@ sens_loo_plot <- function(sens_loo_summary, data){
            lab_ci=paste0("[",format(round(lab_ci_lb,2),2),
                          "; ",format(round(lab_ci_ub,2),2),"]"))%>%
     ggplot()+
-    geom_errorbarh(aes(xmin=beta-1.96*SE, xmax=beta+1.96*SE, y=author_y))+
+    geom_errorbarh(aes(xmin=lab_ci_lb, xmax=lab_ci_ub, y=author_y))+
     geom_point(aes(x=beta ,y=author_y), size=4)+
-    geom_vline(xintercept=0, linetype=2)+
-    scale_y_discrete(breaks=rev(unique(data$author_y)),
-                     limits=c(rev(unique(data$author_y))," "))+
+    geom_vline(xintercept=0, linetype=1)+
+    geom_vline(xintercept=original_results$beta, linetype=2)+
+    scale_y_discrete(breaks=rev(c(unique(data$author_y),"Original result")),
+                     limits=c(rev(c(unique(data$author_y),"Original result"))," "))+
     geom_text(aes(x=.50,y=author_y,label=lab_I_squared),size=3)+
-    geom_text(aes(x=.58,y=author_y,label=lab_beta),size=3)+
-    geom_text(aes(x=.64,y=author_y,label=lab_ci),size=3)+
-    geom_text(aes(x=.50,y=20,label="I^2"),size=4)+
-    geom_text(aes(x=.58,y=20,label="dppc2"),size=4)+
-    geom_text(aes(x=.64,y=20,label="95\\%CI"),size=4)+
+    geom_text(aes(x=.54,y=author_y,label=lab_beta),size=3)+
+    geom_text(aes(x=.60,y=author_y,label=lab_ci),size=3)+
+    geom_text(aes(x=.50,y=21,label=label_I_squared),size=4)+
+    geom_text(aes(x=.54,y=21,label=label_dppc2),size=4)+
+    geom_text(aes(x=.60,y=21,label=label_ci),size=4)+
     scale_x_continuous(breaks = seq(0,.45, by=.05))+
     labs(y="Obmitted study",
          x="Beta coefficient")+
@@ -512,6 +568,9 @@ sens_loo_plot <- function(sens_loo_summary, data){
   }
 
 #----    sens_cook    ----
+
+# compute Cook's distances for each study
+
 sens_cook <- function(fit_rma_mv){
   sens_cook = as.data.frame(
     cooks.distance(fit_rma_mv, cluster = fit_rma_mv$data$study))%>%
@@ -522,6 +581,8 @@ sens_cook <- function(fit_rma_mv){
   return(sens_cook)
 }
 #----    sens_cook_plot    ----
+
+# Ploot Cook's distances
 
 sens_cook_plot <- function(sens_cook_summary){
   ggplot(sens_cook_summary)+
@@ -544,20 +605,6 @@ sens_cook_plot <- function(sens_cook_summary){
 ################################
 ####    Publication Bias    ####
 ################################
-
-# selected_data <- data%>%
-#   filter(r_size=="r_mediumh")
-# 
-# ex1 <- MAd::agg(id = study, es = yi_dppc2, var = vi_dppc2, cor=.5, 
-#          method="BHHR", data=selected_data)
-# 
-# ex2 <- MAd::agg(id = study, es = yi_dppc2, var = vi_dppc2, cor=.5,
-#                 n.1=n_eg, n.2=n_cg,
-#                 method="GO1", data=selected_data)
-# 
-# agg_meta <- rma(yi=es,vi=var, data=ex1)
-# rma(yi=es,vi=var, data=ex1)
-# rma(yi=es1,vi=var1, data=ex2)
 
 
 #-------------
