@@ -26,6 +26,14 @@ In the folder `R/` the R-scripts used in the analysis are saved. Using the `drak
 - [Analysis.R](R/Analysis.R) is the script used to run the whole analysis.
 
 
+### Run the Analysis
 
+In order to run the analysis follow these steps:
+
+1. Open R/R-studio and install the package "renv": `install.packages("renv")`; then close R/R-studio.
+2. Open the R-project "DMGC_Meta"  by double-cliking the file `DMGC_Meta.Rproj` in the folder.
+3. Run the line `renv::restore()` to install the same version packages used in the original analysis.
+4. Open the file `R/Analysis.R` and run each line of the sections "Load", "Check", and "Make".
+5. Now you can access the targets with the results using the functions `drake::loadd(name_target)` and `drake::readd(name_target)`.
 
 
