@@ -516,7 +516,7 @@ sens_summary_plot <- function(sens_summary){
   
   legend = get_legend(p1)
   
-  grid.arrange(p1+theme(legend.position = "none"),
+  gridExtra::grid.arrange(p1+theme(legend.position = "none"),
                p2,p3,legend,
                ncol=1, heights=c(6,6,6,1))
   

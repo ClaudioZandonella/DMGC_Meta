@@ -12,7 +12,7 @@ source("R/Plan.R")      # load analysis plan
 #----    Check   -----
 
 # Configure the analysis plan
-config <- drake_config(plan)
+config <- drake::drake_config(plan)
 
 # Plot the analysis plan
 vis_drake_graph(config, font_size = 16, targets_only = T)

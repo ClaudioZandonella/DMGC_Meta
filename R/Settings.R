@@ -16,6 +16,7 @@ packages_list <- c("conflicted",
                    "MAd",
                    "visNetwork")
 
+
 # load packages
 lapply(packages_list,require, character.only = TRUE)
 
@@ -31,16 +32,24 @@ lapply(packages_list,require, character.only = TRUE)
 
 #----    renv comands    ----
 
+# renv::settings$snapshot.type("simple")
 # renv::purge()
-# renv::hydrate(packages_list)
+# renv::hydrate("drake")
+# sapply(packages_list, renv::hydrate)
 # renv::remove()
+# renv::install("drake")
 # renv::snapshot()
+# renv::install
+# renv::dependencies()
+
+
+
 
 #---- function conflicts   ----
-# conflict_scout()
+# conflicted::conflict_scout()
 
-conflict_prefer("filter", "dplyr")
-conflict_prefer("gather", "tidyr")
+conflicted::conflict_prefer("filter", "dplyr")
+conflicted::conflict_prefer("gather", "tidyr")
 
 
 
