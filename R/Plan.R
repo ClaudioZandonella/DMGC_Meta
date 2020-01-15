@@ -155,9 +155,9 @@ plan <- drake_plan(
     # Define an analysis target for each moderator
     transform = map(moderator_value = c("N", "vi_dppc2"))
   )
-  #---- 
-
-
+  
+  #----    Report Analysis    ----
+  #report_analysis = knitr_in("Report_analysis/Report_analysis.Rnw")
   )
 
 

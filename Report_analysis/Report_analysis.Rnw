@@ -1,13 +1,13 @@
 
-%%%%% Basic packages  %%%%%%%%
+%----    Basic packages    ----%
 \documentclass{article}  
 \usepackage[T1] {fontenc} 		  % Font encoding
 \usepackage [utf8] {inputenc}		% Encoding for the document
-\usepackage{a4wide}             % Wider layout
+\usepackage[a4paper,includeheadfoot,top=2.4cm, bottom=2cm, left=2.4cm, right=2.4cm]{geometry}  % margin settings
 \usepackage[english]{babel}      
 
 
-%%%%  Packages for using Kable Extra  %%%%
+%----    Packages for using Kable Extra    ----%
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
@@ -24,51 +24,75 @@
 \usepackage{xcolor}
 
 
-%%%% Other packages  %%%%
-\usepackage{tikz}
-\usepackage{graphicx}
-\usepackage{amsmath}
+%----    Other packages    ----%
+\usepackage{tikz}       
+\usepackage{graphicx}   % for including graphics
+\usepackage{amsmath}    % for math equation
 \usepackage{csquotes}
-\usepackage{setspace} % line spacing
-\setstretch{1.5}
 \usepackage{enumitem}  % for bold enumerate
 \setlist[enumerate]{font=\bfseries}
 \usepackage[labelfont=bf]{caption}  % caption
 \usepackage[style=apa,backend=biber]{biblatex}  % bibliografia
 \addbibresource{DMGC_Meta.bib}
 
-\renewenvironment{knitrout}{\renewcommand{\baselinestretch}{1}}{} % sett line spacing for knitr output
-\usepackage{hyperref}
+\usepackage{hyperref}    % ref between elements
+
+
+%----    LaTeX Settings    ----%
+
+\newcommand{\textstreach}{\renewcommand{\baselinestretch}{1.5}}{} % default line stretch
+\newcommand{\codestreach}{\renewcommand{\baselinestretch}{1}}{}   % code line streach
+   
+\textstreach
+
+%---------------
+% Added comand to resolve bug of pgf path when looking for raster images
+\let\pgfimageWithoutPath\pgfimage 
+\renewcommand{\pgfimage}[2][]{\pgfimageWithoutPath[#1]{figure/#2}}
+%---------------
+
 
 %%%%%%%%%%%%%%%%%%%%%%          Settings        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-<<settings, echo=FALSE, include=F>>=
-  
-rm(list=ls())
+<<knitr_settings, echo=FALSE, include=F, cache=FALSE>>=
+# Set root directory
+#knitr::opts_knit$set(root.dir = normalizePath(".."))
 
-# Directories
-main_directory<-""
-data_directory<-"~/Dottorato/Lavori/DMGC_Meta/"
+# Chunks settings
+knitr::opts_chunk$set(echo = FALSE, 
+                      # Plot settings
+                      dev = "tikz", dev.args=list(pointsize=12),fig.align='center',
+                     # fig.height=3, fig.width=5,
+                      # Code output width
+                      tidy=TRUE, tidy.opts = list(width.cutoff = 88), options(width=88),
+                      # Cache options
+                      cache = TRUE, autodep=TRUE)
+
+# Chunk theme
+thm=knit_theme$get("bclear")
+knitr::knit_theme$set(thm)
+knitr::opts_chunk$set(background = c(.985, .985, .985))
+
+@
+
+<<R_settings, echo=FALSE, include=F, cache=FALSE>>=
 
 system (paste ("biber", sub ("\\.Rnw$", "", current_input())))
 
+library("knitr")
+library("kableExtra")
+library("ggplot2")
+library("drake")
 
-library(ggplot2)
-library(kableExtra)
-library(tidyverse)
-
-# Knitr settings
-knitr::opts_chunk$set(echo = FALSE, dev = "tikz", dev.args=list(pointsize=10))
-knitr::opts_knit$set(out.format = "latex")
-thm=knit_theme$get("bclear")
-knitr::knit_theme$set(thm)
-
-
+# Option KableExtra
 options(knitr.kable.NA = '')
 
 ## ggplot settings
 theme_set(theme_classic()+
           theme(text = element_text(size=12)))
+
+knitr::read_chunk("../R/Functions.R")
+
 @
   
   
@@ -128,8 +152,6 @@ theme_set(theme_classic()+
 \pagenumbering{arabic}
 \section{Introduction}
 
-\vspace{1em}
-
 In this report we consider the common problem encontered in Meta-Analysis when studies report more than one single effect-size. Common approachs to Meta-Analysis assume independence between effect sizes, so each study should contribute with only one effect size. Howevere, this assumption is violated when studies report more than one effect because multiple effects within a study are not independent. Studies may have measured multiple outcome on the same subjects or multiple effects could have been computed considering the same control group (i.e., evaluationg the effects of two different treatments using the same control group). Even when the different outcomes were evaluated on independent subjects within a study, effects can not be considered truly independent as they are related by other aspects that characterize the study such as instruments and methods used, geographic area, or research group. 
 
 In oreder to take into account the dependency between effect sizes, different approaches are proposed \parencite{pigottMethodologicalGuidancePapers2019,moeyaertMethodsDealingMultiple2017}:
@@ -144,7 +166,21 @@ The present report is divided into different section:
 \begin{itemize}
     \item{\textbf{Section \ref{Theoretical_Aspects}:} The theoretical aspects and implication of the three methods are briefly presented}
 \end{itemize}
-\vspace{1em}
+
+<<echo=TRUE, fig.height=7>>=
+# some really long code # some really long code # some really long code # some really long code # some really long code # some really long code # some really long code # some really long code # some really long code # some really long code
+
+readd(plot_effects_participants)
+@
+
+<<load_dataset, echo=T, eval=F>>=
+
+@
+
+<<wd,  echo=T, eval=T>>=
+
+@
+
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

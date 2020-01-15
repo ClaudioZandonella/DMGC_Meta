@@ -1,0 +1,10 @@
+
+# LaTeX auxiliary files
+
+Report_analysis.tex
+
+# Cache folder
+cache/*
+
+# Figure folder
+figure/*

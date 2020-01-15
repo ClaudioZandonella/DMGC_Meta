@@ -9,8 +9,6 @@ packages_list <- c("conflicted",
                    "tidyverse",
                    "metafor",
                    "clubSandwich",
-                   "knitr",
-                   "kableExtra",
                    "drake",
                    "gridExtra",
                    "MAd",
@@ -34,7 +32,7 @@ lapply(packages_list,require, character.only = TRUE)
 
 # renv::settings$snapshot.type("simple")
 # renv::purge()
-# renv::hydrate("drake")
+# renv::hydrate("formatR")
 # sapply(packages_list, renv::hydrate)
 # renv::remove()
 # renv::install("drake")

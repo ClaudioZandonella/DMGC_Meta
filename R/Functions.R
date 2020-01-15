@@ -10,9 +10,9 @@
 #----    load_dataset function   ----
 
 load_dataset <- function(){
-  #---- load_dataset ----
+#---- load_dataset ----
   data_raw <- read.csv("Data/Dataset.csv",sep=";", header = T, stringsAsFactors = F)
-  #----
+#----
   return(data_raw)
 }
 
