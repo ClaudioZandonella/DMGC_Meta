@@ -28,6 +28,7 @@
 \usepackage{tikz}       
 \usepackage{graphicx}   % for including graphics
 \usepackage{amsmath}    % for math equation
+\usepackage{bm}         % for bold math
 \usepackage{csquotes}
 \usepackage{enumitem}  % for bold enumerate
 \setlist[enumerate]{font=\bfseries}
@@ -109,18 +110,21 @@ knitr::read_chunk("../R/Functions.R")
 
 \centering
 	\vspace*{2cm}
-	{\LARGE Multiple outcomes in Meta-Analysis:\\
-	a comparison between robust variance estimation, multilevel meta-analysis, and averaging effect sizes}\\
+	{\huge \bf The effects of educational video-games on students motivation to math: A meta-analysis
+in K-12}\\
 	\vspace{1cm}
-	{\Large Claudio Zandonella Callegher\par}
+	{\Large List authors\par}
   \vspace{1cm}
-  {University of Padova\\
-  Department of Developmental Psychology and Socialization\par}
-	\vspace{2.5cm}
-	{\huge\bfseries Internal Report\par}
+  {List affiliations\par}
+	\vspace{2cm}
+	{\huge\bfseries Analysis Report\par}
 	\vspace{1cm}
+	{\Large\textit{Edited by}}
+	
+	\vspace{1em}
+	{\Large Claudio Zandonella Callegher*}
 	\vfill
-	e-mail addresses\par
+	*e-mail address\par
 	\href{mailto:claudio.zandonella@gmail.com}{claudiozandonella@gmail.com}
 
 	\vfill
@@ -144,6 +148,69 @@ knitr::read_chunk("../R/Functions.R")
 \listoftables
 
 \end{titlepage}
+
+%----------------------------------------------------------------------------------%
+%--------------------------         Introduction         --------------------------%
+%----------------------------------------------------------------------------------%
+
+\pagenumbering{arabic}
+\section{Introduction}
+
+In this report the statistical analyses of the article \textit{"The effects of educational video-games on students motivation to math: A meta-analysis
+in K-12"} are presented. The aim of the meta-analysis was to synthesized results of the studies concerning the impact of educational video-games on students’ motivation towards mathematics.
+
+Here, we will focus only on the statistical analysis. For theoretical aspects, study selection, and results interpretation the reader can refer directly to the article.
+
+%------------------------
+\subsection{Report sections}
+
+The analysis report is divided into different sections:
+\begin{itemize}
+    \item{\textbf{Section~\ref{sec:Statistical_Approach}:} the statistical approach and the plan of analysis are presented.}
+    \item{\textbf{Section~\ref{sec:Data_Presentation}:} the dataset is presented with a brief description of each variable.}
+    \item{\textbf{Section~\ref{sec:Descriptive_Statistics}:} the descriptive statistics are presented.}
+\end{itemize}
+
+\newpage
+
+%----------------------------------------------------------------------------------%
+%--------------------------    Statistical Approach      --------------------------%
+%----------------------------------------------------------------------------------%
+
+\section{Statistical Approach}
+\label{sec:Statistical_Approach}
+
+In this section, the statistical approach and the plan of the meta-analysis are presented. Fist, the selected effect size is described. Subsequently, we discuss the reasons why multilevel meta-analysis is used to account for the dependence of effect sizies within the same studies. Finally, the plan of the meta-analysis is summarized.
+
+%------------------------
+\subsection{Measure of effect size}
+
+%-------------
+\subsubsection{The pre- post- control group design}
+
+Selected studies were charcterized by a pre- post- control group design (PPC). In a PPC desing, participants are randomly assigned to one (or more) experimental group and to one (or more) control group. Both groups are evaluated before (pre-test score) and after (post-test score) the experimental group is exposed to a treatment.
+
+The PPC design allows to evaluate the efficacy of the treatment taking into account pre-existing differeences between the two groups and  concurrent factors or events other than the treatment that produce changes in the outcome variable.
+
+The efficacy of the treatment can evaluated considering the standardized mean change in both groups. The standardized mean change of each group is defined as the mean difference between post-test ($\mu_{post}$) and pre-test ($\mu_{pre}$) scores, divided by the standard deviation ($\sigma$):
+\begin{equation} \label{eq:mean_change}
+\delta= \frac{\mu_{post} - \mu_{pre}}{\sigma}.
+\end{equation}
+
+Thus, assuming common standard deviation ($\sigma$), the efficacy of the treatment can be defined  as the difference in standardized mean change between the experimental group and the control group:
+\begin{equation} \label{eq:effect}
+\Delta=\delta_{Eg} - \delta_{Cg} = \frac{ (\mu_{Eg,post} - \mu_{Eg,pre}) - (\mu_{Cg,post} - \mu_{Cg,pre})}{\sigma},
+\end{equation}
+where \textit{Eg} stands for experimental group and \textit{Cg} stands for control group.
+
+
+%-------------
+\subsubsection{The effect size estimate}
+
+To estimate the effect size, there are three alternatives that differ in the way the common standard deviation ($\sigma$) is estimated. \textcite{morrisEstimatingEffectSizes2008} discuss and evaluate the three alternatives:
+\begin{enumerate}
+  \item{$\bm{d_{ppc1}}$}
+\end{enumerate}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
