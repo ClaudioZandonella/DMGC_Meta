@@ -32,6 +32,8 @@
 \usepackage{csquotes}
 \usepackage{enumitem}  % for bold enumerate
 \setlist[enumerate]{font=\bfseries}
+\setlist[enumerate]{itemsep=0ex} % reduce space between items
+\setlist[itemize]{itemsep=0ex} % reduce space between items
 \usepackage[labelfont=bf]{caption}  % caption
 \usepackage[style=apa,backend=biber]{biblatex}  % bibliografia
 \addbibresource{DMGC_Meta.bib}
@@ -46,6 +48,8 @@
    
 \textstreach
 
+%----    Todo    -----%
+\newcommand{\todo}[1]{(\textcolor{red}{Todo: #1})}
 %---------------
 % Added comand to resolve bug of pgf path when looking for raster images
 \let\pgfimageWithoutPath\pgfimage 
@@ -80,9 +84,9 @@ knitr::opts_chunk$set(background = c(.985, .985, .985))
 
 system (paste ("biber", sub ("\\.Rnw$", "", current_input())))
 
+library("tidyverse")
 library("knitr")
 library("kableExtra")
-library("ggplot2")
 library("drake")
 
 # Option KableExtra
@@ -94,6 +98,11 @@ theme_set(theme_classic()+
 
 knitr::read_chunk("../R/Functions.R")
 
+
+# load drake results
+loadd(data_raw)
+loadd(data_effect)
+loadd(data)
 @
   
   
@@ -167,7 +176,7 @@ Here, we will focus only on the statistical analysis. For theoretical aspects, s
 The analysis report is divided into different sections:
 \begin{itemize}
     \item{\textbf{Section~\ref{sec:Statistical_Approach}:} the statistical approach and the plan of analysis are presented.}
-    \item{\textbf{Section~\ref{sec:Data_Presentation}:} the dataset is presented with a brief description of each variable.}
+    \item{\textbf{Section~\ref{sec:Data_Preparation}:} the dataset is presented with a brief description of each variable and prepared for the analysis.}
     \item{\textbf{Section~\ref{sec:Descriptive_Statistics}:} the descriptive statistics are presented.}
 \end{itemize}
 
@@ -180,7 +189,7 @@ The analysis report is divided into different sections:
 \section{Statistical Approach}
 \label{sec:Statistical_Approach}
 
-In this section, the statistical approach and the plan of the meta-analysis are presented. Fist, the selected effect size is described. Subsequently, we discuss the reasons why multilevel meta-analysis is used to account for the dependence of effect sizies within the same studies. Finally, the plan of the meta-analysis is summarized.
+In this section, the statistical approach and the plan of the meta-analysis are presented. Fist, we describe the measure of effect size used to evaluate effetiveness of the interventions. Subsequently, we discuss the reasons why multilevel meta-analysis is used to account for the dependence of multiple effect sizies within the same studies. Finally, the plan of the meta-analysis is summarized.
 
 %------------------------
 \subsection{Measure of effect size}
@@ -209,56 +218,217 @@ where \textit{Eg} stands for experimental group and \textit{Cg} stands for contr
 
 To estimate the effect size, there are three alternatives that differ in the way the common standard deviation ($\sigma$) is estimated. \textcite{morrisEstimatingEffectSizes2008} discuss and evaluate the three alternatives:
 \begin{enumerate}
-  \item{$\bm{d_{ppc1}}$}
+  \item{$\bm{d_{ppc1}}$}: the effect size is computed using separate estimates of pre-test standard deviation for the experimental group (\textit{Eg}) and the control group (\textit{Cg}). That is,
+  \begin{equation}
+  d_{ppc1}= c_{Eg} \frac{(M_{Eg,post}-M_{Eg,pre})}{SD_{Eg,pre}} - c_{Cg} \frac{(M_{Cg,post}-M_{Cg,pre})}{SD_{Cg,pre}},
+  \end{equation}
+  where $c_{Eg}$ and $c_{Cg}$ are bias adjustemts for small samples, $M_{pre}$ and $M_{post}$ are the mean scores in the pre-test and post-test, and $SD_{pre}$ is the standard deviation in the pre test.
+  \item{$\bm{d_{ppc2}}$}: the effect size is computed by pooling the data from the experimental and control group in the pre-test to estimate the population standard deviation. That is,
+  \begin{equation}
+  d_{ppc2}= c_{P} \left[ \frac{(M_{Eg,post}-M_{Eg,pre})- (M_{Cg,post}-M_{Cg,pre})}{SD_{pre}}\right],
+  \end{equation}
+  where $SD_{pre}$\footnote{$SD_{pre} = \sqrt{\frac{(n_{Eg}-1)SD_{Eg,pre}^2 + (n_{Cg}-1)SD_{Cg,pre}^2}{n_{Eg}+n_{Cg}-2}}$} is the pooled standard deviation in the pre-test scores, and $c_P$\footnote{$c_P = 1-\frac{3}{4(n_{Eg}+n_{Cg}-2)-1}$} is a bias adjustment for small sample size.
+  \item{$\bm{d_{ppc3}}$}: the effect size is computed by pooling the data from the experimental and control group in both the pre-test and post-test to estimate the population standard deviation.That is,
+  \begin{equation}
+  d_{ppc3}= c_{PP} \left[ \frac{(M_{Eg,post}-M_{Eg,pre})- (M_{Cg,post}-M_{Cg,pre})}{SD_{pre+post}}\right],
+  \end{equation}
+  where $SD_{pre+post}$\footnote{$SD_{pre+post} = \sqrt{\frac{(n_{Eg}-1)SD_{Eg,pre}^2 + (n_{Cg}-1)SD_{Cg,pre}^2 + (n_{Eg}-1)SD_{Eg,post}^2 + (n_{Cg}-1)SD_{Cg,post}^2}{2(n_{Eg}+n_{Cg}-2)}}$} is the pooled standard deviation in the pre-test and post-test scores, and $c_{PP}$\footnote{$c_{PP} = 1-\frac{3}{4(2n_{Eg}+2n_{Cg}-4)-1}$} is a bias adjustment for small sample size.
 \end{enumerate}
+\textcite{morrisEstimatingEffectSizes2008} suggested the $d_{ppc2}$ as the favorite effect size estimate in terms of bias, precision, and robustness to heterogeneity of variance. Given the assumption of homogeneity of variance in the two populations, $d_{ppc2}$ allows a better estimate of the population standard deviation by pooling the data from the experimental and control groups in the pre-test. On the countrary, $d_{ppc1}$ uses separate estimates of the sample standard deviation for experimental and control groups and $d_{ppc3}$ includes in the pooled standard deviation also results from the post-test of the two groups. These solutions are not optimal as, in the first case, we do not take advantage of the assumption of homogeneity of variance, and in the second case post-test variances tend to be larger than pre-test variances given possible interaction between treatment effect and individual differences.
+
+The formula to compute the variance of $d_{ppc2}$ is provided by \textcite[see p.373 eq.25]{morrisEstimatingEffectSizes2008}:
+\begin{equation}\label{eq:dppc2_variance}
+\sigma^2(d_{ppc2}) = 2 (c_p^2) (1-\rho) \left(\frac{n_{Eg}+n_{Cg}}{n_{Eg}n_{Cg}}\right) \left(\frac{n_{Eg}+n_{Cg}-2}{n_{Eg}+n_{Cg}-4}\right) \left(1+\frac{d_{ppc2}^2}{2(1-\rho) \left(\frac{n_{Eg}+n_{Cg}}{n_{Eg}n_{Cg}}\right)}\right)-d_{ppc2}^2,
+\end{equation}
+where $\rho$ is the the correlation between pre- and post-test scores, and $n_{Eg}$ and $n_{Cg}$ are the two groups sample size.
+
+Following reccomendations of the author, we used the $d_{ppc2}$ to estimate the effect size of the studies included in the meta-analysis.  
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%      Introduction       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\pagenumbering{arabic}
-\section{Introduction}
+%------------------------
+\subsection{Multilevel meta-analysis}
 
-In this report we consider the common problem encontered in Meta-Analysis when studies report more than one single effect-size. Common approachs to Meta-Analysis assume independence between effect sizes, so each study should contribute with only one effect size. Howevere, this assumption is violated when studies report more than one effect because multiple effects within a study are not independent. Studies may have measured multiple outcome on the same subjects or multiple effects could have been computed considering the same control group (i.e., evaluationg the effects of two different treatments using the same control group). Even when the different outcomes were evaluated on independent subjects within a study, effects can not be considered truly independent as they are related by other aspects that characterize the study such as instruments and methods used, geographic area, or research group. 
+Traditional meta-analysis approaches are based on the assumption that each effect sizes is independent, so each study should contribute with only one effect size. However, dependency among effect sizes is very common. Studies could evaluate the same subjects on multiple outcomes providing measures that are clearly not independent, or, even when outcomes are measured on independent samples, multiple effects within the same study are not independent. In fact, they share other common aspect as the design of the experiment, instruments used, treatment charateristics, research group, geographycal region, etc., that may influence the effects to be more similar to each other.
 
-In oreder to take into account the dependency between effect sizes, different approaches are proposed \parencite{pigottMethodologicalGuidancePapers2019,moeyaertMethodsDealingMultiple2017}:
+In order to take into account the dependency between effect sizes, different approaches are proposed \parencite{pigottMethodologicalGuidancePapers2019,moeyaertMethodsDealingMultiple2017}:
 \begin{enumerate}
-    \item{averaging effect sizes}
-    \item{robust variance estimation}
-    \item{multilevel meta-analysis}
+    \item{\bf Averaging effect sizes}. When similar measures of the same undelying construct are provided, it is reasonable to use the average of the effect sizes to summarize the study results. \textcite[see Part 5: Complex data structure]{borensteinIntroductionMetaanalysis2009} describe how to compute a composite effect size and variance taking according to the dependence structures of the effect size within the study.
+    \item{\bf Robust variance estimation (RVE)}. \textcite{hedgesRobustVarianceEstimation2010} recomend to use the RVE  when evaluating dependent effects in a meta-analysis. The overall effect size over studies is computed as a weighted mean of the observed effect size and the sampling variance estimate is obtained by means of an aproximation of the covariance-matrix of each study. \textcite{hedgesRobustVarianceEstimation2010} demonstrate that RVE meta-analysis with non-independent effect sizes produces valid results even in the case of  misspecified covariace sturcture. As the number of the studies increase the results will converge to the correct values. Moreover, \textcite{tiptonSmallSampleAdjustments2015} provided adjusted estimators to the RVE that increase the reliabilty of the results even when the number of studies is small.
+    \item{\bf Multilevel meta-analysis}. All random-effects meta-analysis are multilevel as they assume a two-level stucture where the observed effects are an estimation of each study "true" effect that is sampled from an overarching distribution of "true" effects. However, in this case we refer to three-level meta-analysis model, where participants are included at level 1, measured outcomes at level 2, and study at level 3. In this three level approach, the dependency between effect size within studies is automatically accounted for in the covariance matrix \parencite{vandennoortgateMetaanalysisMultipleOutcomes2015}.
 \end{enumerate}
 
-In the present work we briefly describe these approaches and evaluate the possibly different results they give. We consider as a case study a meta-analysis that evaluates the effect of computer based intervention on children attitude and motivation towards mathematics.
-The present report is divided into different section:
+\textcite{moeyaertMethodsDealingMultiple2017} compared the three approaches and reported that  both the RVA and the multilevel approach give unbiased parameter estimates, standard errors and variances. Whereas, averaging effect sizes is too conservative because in general standard errors are overestimated. Moreover, the RVA and the multilevel approach allow to include in the  meta-analytic model predictors at the outcome level to account for differences beteen outcomes within the same studies.
+
+In the present meta-analysis, we decided to adopt a multilevel approach as it allows us to specify the kind of dependency between effect size specifically for each study. Multilevel meta-analysis offers a great flexibility in accomodating differente type of dependency among effect sizes within studies.
+
+On the contrary, RVA approach allows only to decide between a correlated effects dependence structure or a hierarchical dependence structure for all the studies \parencite{hedgesRobustVarianceEstimation2010, tiptonSmallSampleAdjustments2015}. In the first case, within each study outcomes are assumed to be measured on the same underlying units. In the second case, multiple (independent) outcomes are measured within studies, but they are related by other aspects such as research organizations, research labs, or research groups.
+
+%------------------------
+\subsection{Analysis plan}
+
+The analysis are conducted with R software \parencite[version \Sexpr{paste0(c(version$major,".",version$minor,";"))}][]{rcoreteamLanguageEnvironmentStatistical2018}. First, we load and prepare the dataset for the analysis, computing the effect size estimate and variance for each outcome. As presented in Formula~\ref{eq:dppc2_variance}, values of the correlation between pre-test and post-test scores are needed to the compute $d_{ppc2}$ variance. Howevere, none of the studies reported this information. To overcome this issue, $d_{ppc2}$ variance is computed with different correlation values and their influece on the meta-analysis results will be subsequently evaluated.
+
+Next, descriptive statistics are presented to evaluate the main charateristics of the data included in the analysis.
+
+Multilevel meta analysis is conduct using the restricted maximum likelihood method with the R-package \texttt{metafor} \parencite{viechtbauerConductingMetaanalysesMetafor2010}. Variance-covariance matrix is defined for each study according to the specific outcomes dependece structure. However, studies with multiple measure on the same subjects did not reported the correlation between outcomes needed to specify dependence structure. In these cases, variance-covariance matrix is computed with different correlation values and their influece on the meta-analysis results will be subsequently evaluated. Results are presented and heterogeneity between studies is assesed through inspection of forest plot and evaluation of the Q-statistic \parencite{hedgesStatisticalMethodsMetaanalysis2014}. Under the null hypothesis, the Q-statistic is distributed as a chi-square with degrees of freedom equal to the number of studies minus one. A significant chi-value indicates the presence of heterogeneity across studies. Moreover, to estimate the magnitude of the heterogeneity the $I^2$ index is reported \parencite[i.e., the proportion of observed variance that reflects real and not random difference between studies effect sizes;][]{borensteinIntroductionMetaanalysis2009}. High values of $I^2$ suggest that differences between results are related to real differences across studies (i.e., different constructs or different study design). On the contrary, low values of $I^2$ suggest that results across studies are similar and possible differences are related to random sampling.
+
+
+To investigate robustness of the results, a sensitivity analysis is conducted to evaluate how the values of the correlation between pre-test and post-test scores and the values of the correlation between dipendent outcomes influece the meta analysis results. Moreover, a \textit{Leave-One-Out} (LOO) sensitivity analysis considering the study grouping level is run to assess the possible presence of influencial studies. Substantial changes when a single study is removed would be interpreted as lack of homogeneity and unreliable results \parencite{viechtbauerOutlierInfluenceDiagnostics2010}.
+
+Next, we present the alternative results obtained using the different meta-analitic approaches presented above, which are robust variance estimation (RVE) approach and averaging effect sizes approach. RVE is conducted using the R-package \texttt{robumeta} \parencite{fisherRobumetaRpackageRobust2015, fisherRobumetaRobustVariance2017} considering a correlated effects dependence structure. Averaged effect sizes are obtained acording to \textcite{borensteinIntroductionMetaanalysis2009} indiations as implemented in the R-package \texttt{MAd} \parencite{hoytMAdMetaanalysisMean2014}.
+
+Subsequently, publication bias is assessed. To our knowledge, there are no specific methods designed to correctly evaluate pubblication bias in a multilevel meta-analysis. Funnel plot is presented as a graphical representation of the simmetry of the effects distribution. However, this is not optimal as studies with multiple effects are overrepresented in the plot respect to studies with only one effect. To overcome this issue, we conduct separetly two Egger’s regression tests to evaluate if effect sizes are associated to sample size or sampling variance of the estimated effect. In the absence of publication bias, the regression coefficient is expected to be zero
+\parencite{linQuantifyingPublicationBias2018, eggerBiasMetaanalysisDetected1997}. Moreover, the result of the rank correlation test is reported to examine whether the observed outcomes and the corresponding sampling variances are correlated \parencite{beggOperatingCharacteristicsRank1994}.
+
+Alternatively, funnel plot with the \textit{trim-and-fill} method \parencite{duvalTrimFillSimple2000,rothsteinPublicationBiasMetaanalysis2005} is presented considering the aggregated effects.
+
+Finally, the role of possible moderators is examined using mixed-effects meta-regression models, the moderators are included as a fixed effects and are tested using Wald’s chi-square \parencite{viechtbauerConductingMetaanalysesMetafor2010}. Considering the reduced number of studies and the unequal distribution among the different levels of the moderators, separate analyses are conducted for each moderator. Results have to be interpreted with caution as it moderators are not evaluated toghether to understand the unique variance explained by each moderator.
+
+%------------------------
+\subsection{Analysis reprodicibility}
+
+To guarantee the reproducibilty of the results, the whole analysis is structured within an \textit{R-project} named \texttt{DMGC\_Meta.Rproj} that is possible to download from this repository \todo{add repository link}.
+
+The R-package \texttt{drake} \parencite{landauDrakePackagePipeline2018} is used to manage the analysis workflow and to enhance the readability and transparency of the analysis. To know more about \texttt{drake} consider the official Git-hub page (\url{https://github.com/ropensci/drake}) or the user manual(\url{https://books.ropensci.org/drake/}). Summarizing, using \texttt{drake} the code of the analysis is organized into different scripts. The user defines the plan of the analysis where each sterp in the analysis is defined trough functions. Functions can be can be approriately defined to obtain desired targets (i.e., R-output with results of interests) and they are declared in another script. Subsequently, \texttt{drake} manage the whole analysis recognizing the dependency structure of the different targets. When any change is make to the code \texttt{drake} evaluate the analysis and update the results. Using function to define each step of the analysis allows to avoid "\textit{coping and paste}" in the code, it makes debugging easier, and it facilitates the reading of the code.
+
+Moreover, the R-package \texttt{renv} \parencite{usheyRenvProjectEnvironments2019} is used to manage the dependencies of the R-packages used in the analysis. The \texttt{renv} package allows to create an isolated, portable, and reproducible environment where the analyses are run. To know more about \texttt{renv} consider the official documentation (\url{https://rstudio.github.io/renv/articles/renv.html}).
+
+Finally, git version control was used to track the changes during the analysis.
+
+%-------------
+\subsubsection{R-project structure}
+
+The R-project \texttt{DMGC\_Meta.Rproj} is organized into different folders. In the folder \texttt{Data/}, the raw datasets with the information regarding the studies selected in the literature review are stored.
+
+In the folder \texttt{R/}, the R-scripts used in the analysis are stored. Using the \texttt{drake} package the analysis is organized into different R-scripts files:
 \begin{itemize}
-    \item{\textbf{Section \ref{Theoretical_Aspects}:} The theoretical aspects and implication of the three methods are briefly presented}
+  \item{\texttt{Settings.R}} contains the setting for the R sessions, including R-packages used. 
+  \item{\texttt{Plan.R}} contains the plan of the analysis. Where each target (i.e., R-output with results of interests) is defined through functions.
+  \item{\texttt{Function.R}} contains the main functions used in \texttt{Plan.R} to obtain the targets of interest.
+  \item{\texttt{Auxiliary\_functions.R}} contains other functions used in the analysis.
+  \item{\texttt{Analysis.R}} is the script used to run the whole analysis.
 \end{itemize}
 
-<<echo=TRUE, fig.height=7>>=
-# some really long code # some really long code # some really long code # some really long code # some really long code # some really long code # some really long code # some really long code # some really long code # some really long code
 
-readd(plot_effects_participants)
-@
+%-------------
+\subsubsection{Run the Analysis}
 
-<<load_dataset, echo=T, eval=F>>=
-
-@
-
-<<wd,  echo=T, eval=T>>=
-
-@
+In order to run the analysis follow these steps:
+\begin{enumerate}
+  \item{Make sure you have already the \texttt{renv} R-package installed in your lybrary. If not, run the command in R or R-studio \texttt{install.packages("renv")}}
+  \item{Open the R-project \texttt{DMGC\_Meta}  by double-clicking the file \texttt{DMGC\_Meta.Rproj} you can find in the main directory. A new R-studio session should open and a similar message should appear in the console if \texttt{renv} was correctly installed:\\
+    \texttt{* Project '$\sim$/<your\_path>/DMGC\_Meta' loaded. [renv <version\_number>]}}
+  \item{Run the line \texttt{renv::restore()}, \texttt{renv} will ask the permission to install the R-packages used in the analysis, type \texttt{y} and return to confirm.}
+  \item{Open the file `R/Analysis.R` and run each line of the sections "Load", "Check", and "Make".}
+  \item{Now you can access the targets with the results using the functions \texttt{drake::loadd(<name\_target>)} and \texttt{drake::readd(<name\_target>)}.}
+\end{enumerate}
 
 \newpage
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%    Theoretical Aspects   %%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%----------------------------------------------------------------------------------%
+%------------------       Data Presentation and Preparation     -------------------%
+%----------------------------------------------------------------------------------%
 
-\section{Theoretical Aspects} \label{Theoretical_Aspects}
+\section{Data Preparation}
+\label{sec:Data_Preparation}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%    Session Information   %%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In this section, first the raw dataset is presented, then the dataset is prepared for the analysis.
+%------------------------
+\subsection{Data presentation}
+
+In the folder \texttt{Data/}, you can find the file \texttt{Dataset.csv} with all the informations about the selected studies. The dataset includes \Sexpr{nrow(data_raw)} effects sizes grouped within \Sexpr{length(unique(data_raw$study))} different studies. Each line of the dataset is an effect and the charateristics of each effect are summarized in \Sexpr{ncol(data_raw)} variables:
+\begin{enumerate}
+  \item{\texttt{study}} - Numerical variable that indicates the id number of the study. This id number is used in the analysis to refer to a specific study. Values range from \texttt{1} to \texttt{19}.
+  \item{\texttt{id}} - Numerical variable that indicates the id number of the study used during the selection process of elegible studies.
+  \item{\texttt{author}} - Character string with the names of the authors.
+  \item{\texttt{year}} - Numerical variable that indicates the year of pubblication.\footnote{In the case of unpublished studies or grey-litterature the year refears to the realization of the study}.
+  \item{\texttt{pub}} - Character string that indicates if the study is pubblished (\texttt{yes}) or unpublished/ grey-litterature (\texttt{no}).
+  \item{\texttt{grade}} - Numerical variable that indicates school grade of the participants. Primary school is idicated with \texttt{1} and secondary school is idicated with \texttt{2}.
+  \item{\texttt{weeks}} -  Numerical variable that indicates the lenght of the treatment in weeks.
+  \item{\texttt{sessions}} - Numerical variable that indicates the total number of sessions of the treatment.
+  \item{\texttt{minutes}} - Numerical variable that indicates average time in minutes of each session of the treatment.
+  \item{\texttt{device}} - Character string that indicates the device used during the treatment. Personal Computer (\texttt{pc}), console (\texttt{con}), or application on other device (\texttt{app}).
+  \item{\texttt{n\_effect}} - Numerical variable that identifies within each study the different effects. In each study the first effect is identified with \texttt{1}, then the value increases if more effects are reported within the same study. 
+  \item{\texttt{id\_effect}} - Numerical variable that identifies the unique effect. Values range from \texttt{1} to \texttt{43}.
+  \item{\texttt{dependence}} - Character string that indicates the type of dependence among different effect sizes reported within the same study. Study with single effect size (\texttt{none}), mulitple effects measured on the same participants (\texttt{multiple\_outcomes}), mulitple comparison between different experimental groups and same control group (\texttt{multiple\_groups}), or independent effect sizes (\texttt{independent}). 
+  \item{\texttt{N}} - Numerical variable that indicates the total number of participants included to compute the considered effect. This is not always equal to the total number of participants in the study, as multiple experimental or control groups cold be included in the study.
+  \item{\texttt{n\_cg}} - Numerical variable that indicates the number of participants in the control group for the considered effect.
+  \item{\texttt{n\_eg}} - Numerical variable that indicates the number of participants in the experimental group for the considered effect.
+  \item{\texttt{mot}} - Numerical variable that indicates if the considered effect measured the motivation in terms of expectancy (\texttt{1}), in terms of value (\texttt{2}), or did not differentiate between the two aspects (\texttt{NA}).
+  \item{\texttt{m\_t1\_cg}} - Numerical variable that indicates the control group mean score in the pre-test.
+  \item{\texttt{sd\_t1\_cg}} - Numerical variable that indicates the control group standard deviation in the pre-test.
+  \item{\texttt{m\_t2\_cg}} - Numerical variable that indicates the control group mean score in the post-test.
+  \item{\texttt{sd\_t2\_cg}} - Numerical variable that indicates the control group standard deviation in the post-test.
+  \item{\texttt{m\_t1\_eg}} - Numerical variable that indicates the experimental group mean score in the pre-test.
+  \item{\texttt{sd\_t1\_eg}} - Numerical variable that indicates the experimental group standard deviation in the pre-test.
+  \item{\texttt{m\_t2\_eg}} - Numerical variable that indicates the experimental group mean score in the post-test.
+  \item{\texttt{sd\_t2\_eg}} - Numerical variable that indicates the experimental group standard deviation in the post-test.
+\end{enumerate}
+
+The dataset is loaded in R and its stucture is presented below.
+\codestreach
+<<load_dataset,eval=FALSE, echo=TRUE>>=
+@
+<<str_data_raw, echo=TRUE>>=
+str(data_raw)
+@
+\textstreach
+%------------------------
+\subsection{Data munging}
+
+Following \texttt{drake} guidelines, we difine function for each step of the analysis. To organize the dataset we define the following function that allows to state which variables are categorical variables (factors) and uses more explicit labels in some variables. Moreover, we create a variable \texttt{autor\_y} to optain a label in th format \textit{"Author's (year)"} for aech study and the variable \texttt{intensity = sessions*minutes/weeks} as a rough measure of the weekly intensity of each treatment.
+
+\codestreach
+<<clean_data, echo=TRUE, eval=FALSE>>=
+@
+
+In \textcite{paretoTeachableAgentArithmeticGame2011} the gain scores (i.e., the mean difference between post-test and pre-test scores) are reported instead of the post-test scores. Thus, to obtain the post-test scores we define a function that computes the post-test scores. The mean is given by the sum between the mean pre-test score and the mean gain score ($Mean_{post}=Mean_{pre}+Mean_{gain}$). The post-test Standard deviation is given by the square-root of the sum between the variance of the pre-test scores and the variance of the gain scores ($SD_{post}=\sqrt{SD_{pre}^2+SD_{gain}^2}$).
+
+<<pareto_post,echo=TRUE, eval=FALSE>>=
+@
+
+%------------------------
+\subsection{Compute $d_{ppc2}$ value and variance}
+
+To compute the $d_{ppc2}$ value and variance, we use the functions reported in the \texttt{metafor} website (\url{http://www.metafor-project.org/doku.php/analyses:morris2008}). To compute the variance we need the correlation between pre-test and post-test scores. However, correlation are not reported so we try with different values high correlation (\texttt{r\_high = .8}), medium-high correlation (\texttt{r\_mediumh = .6}), medium-low correlation (\texttt{r\_mediuml = .4}), and low correlation (\texttt{r\_low = .2}).
+
+<<compute_dppc2, echo=TRUE, eval=FALSE>>=
+@
+
+<<load_data_effect>>=
+show_hung <- data_effect%>%
+  filter(study=="13", r_size=="r_mediumh")%>%
+  select("study":"year","n_effect":"sd_t2_eg","sd_pool":"vi_dppc2", -"mot")
+
+@
+
+Seamply looking at the effect obtained, we observe a strange value. In \textcite{hungEffectsDigitalGamebased2014} values of \texttt{yi\_dppc2} for the second effect are extreamly huge \Sexpr{show_hung%>%filter(id_effect==33)%>%select(yi_dppc2)%>%round(.,1)}. This value is impossible.
+
+<<show_hung>>=
+show_hung
+@
+
+Considering the measure in the pre-test we can understan the problem. The standard deviation in the pre-tes are extremly low: \Sexpr{show_hung%>%filter(id_effect==33)%>%select(starts_with("sd_t1"))%>%round(.,2)%>%paste(., collapse=" and ")}. This leads to a low value for the pooled standard deviation and in turns an unplausible high value of effect size. That is probably given by the fact that the measure used was not able to evaluate properly the variation among individuals in the pre-test, (maybe floor effect).
+
+We do not include this effect in the meta-analysis and we remove it from the dataset. Thus the final dataset includes \Sexpr{length(unique(data$study))}
+
+<<rm_hung, echo=TRUE, eval=FALSE>>=
+@
+
+
+\newpage
+
+%----------------------------------------------------------------------------------%
+%--------------------------    Descriptive Statistics    --------------------------%
+%----------------------------------------------------------------------------------%
+
+\section{Descriptive Statistics}
+\label{sec:Descriptive_Statistics}
+
+
+%----------------------------------------------------------------------------------%
+%--------------------------    Session Information   ------------------------------%
+%----------------------------------------------------------------------------------%
 
 \section{Session Information}
 
