@@ -16,12 +16,11 @@ load_dataset <- function(){
   return(data_raw)
 }
 
-#----    munge_data function   ----
+#----    clean_data   ----
 
-munge_data <- function(data){
-  #----   munge_data   ----
-  data<-data%>% 
-    # Define which variabel are factor
+clean_data <- function(data){
+  data%>% 
+    # Define which variable are factor
     mutate_at(vars("study","id","pub","dependence","grade","device","mot"), factor)%>% 
     # Redefine factor labels for grade and device
     mutate(grade=recode_factor(grade,"1"="Primary","2"="Secondary"),
@@ -31,38 +30,47 @@ munge_data <- function(data){
            # Compute intensity of the intervention
            intensity = sessions*minutes/weeks)%>%
     select("study":"minutes","intensity",everything())
-  
-  #----- pareto_post -------
-  
-  # Pareto et al (2011) does not report post-test scores but 
-  # gain scores (mean and sd) for the two effects:
-  
-  # To obtain the post-test scores we have:
-  # m_t2_* = m_t1_* + m_gain_*
-  # sd_t2_* = sqrt(sd_t1_*^2 + sd_gain_*^2)
-  # Because variances are independent
-  # (* stands for control group/experimental group)
-  
-  # Control group
+}
+
+#----    pareto_post function   ----
+
+# Pareto et al (2011) does not report post-test scores but 
+# gain scores (mean and sd) for the two effects:
+
+# To obtain the post-test scores we have:
+# m_t2_* = m_t1_* + m_gain_*
+# sd_t2_* = sqrt(sd_t1_*^2 + sd_gain_*^2)
+# Because variances are independent
+# (* stands for control group/experimental group)
+
+#----    pareto_post    ----
+pareto_post <- function(data){
+  # Control group gain 
   m_gain_cg<-c(1.5,-.23)    # Mean gain
   sd_gain_cg<-c(3.82,3.62)  # Sd gain
   
-  # Experimental group
+  # Experimental group gain
   m_gain_eg<-c(.93,1.44)    # Mean gain
   sd_gain_eg<-c(3.09,3.52)  # Sd gain
   
+  data %>%
+    mutate_cond(study=="11",  # Change only rows satisfying the condition
+                # Control group
+                m_t2_cg = m_t1_cg + m_gain_cg,
+                sd_t2_cg = sqrt(sd_t1_cg^2+sd_gain_cg^2),
+                #Experimental group
+                m_t2_eg = m_t1_eg + m_gain_eg,
+                sd_t2_eg = sqrt(sd_t1_eg^2+sd_gain_eg^2))
+  }
+
+#----    munge_data   ----
+
+munge_data <- function(data){
   
-  # Control group
-  data$m_t2_cg[data$study=="11"]<-data$m_t1_cg[data$study=="11"]+m_gain_cg
-  data$sd_t2_cg[data$study=="11"]<-sqrt(data$sd_t1_cg[data$study=="11"]^2+sd_gain_cg^2)
-  
-  # Experimental group
-  data$m_t2_eg[data$study=="11"]<-data$m_t1_eg[data$study=="11"]+m_gain_eg
-  data$sd_t2_eg[data$study=="11"]<-sqrt(data$sd_t1_eg[data$study=="11"]^2+sd_gain_eg^2)
-  
-  #----
-  
-  return(data)
+  data %>%
+    clean_data() %>%
+    pareto_post()
+
 }
 
 #----    compute_dppc2 function    ----
@@ -73,47 +81,33 @@ munge_data <- function(data){
 ## We used the same formulas reported in:
 ## http://www.metafor-project.org/doku.php/analyses:morris2008
 
+# To compute the variance we need the correlation between pre- and post-test scores
+# correlation are not reported so we try with different values
+# high correlation (.8), medium-high correlation (.6),
+# medium-low correlation (.4), and low correlation (.2)
+
+#----    compute_dppc2    ----
 compute_dppc2 <- function(data){
   
-  #----    compute_yi_dppc2    ----
-  
-  # Compute yi_dppc2
-  data<-data%>%
-    mutate(sd_pool= sqrt(((n_eg-1)*sd_t1_eg^2+(n_cg-1)*sd_t1_cg^2)/(n_eg+n_cg-2)),
-           yi_dppc2 = metafor:::.cmicalc(n_eg+n_cg-2)*((m_t2_eg - m_t1_eg) - (m_t2_cg-m_t1_cg))/sd_pool)
-  #----
-  
-  # To compute the variance we need the correlation between pre- and post-test scores
-  # correlation are not reported so we try with different values
-  # high correlation (.8), medium-high correlation (.6),
-  # medium-low correlation (.4), and low correlation (.2)
-  
-  #----    compute_vi_dppc2    ----
-  
-  # Compute vi_dppc2
-  
-  # add correlations pre-post 
-  
-  data<-data%>%
-    mutate(r_high=.8,      # high correlation
-           r_mediumh=.6,   # medium-high correlation
-           r_mediuml=.4,   # medium-low correlation
-           r_low=.2)%>%    # low correlation
+  data%>%
+    mutate(
+      # compute pooled standard deviation
+      sd_pool= sqrt(((n_eg-1)*sd_t1_eg^2+(n_cg-1)*sd_t1_cg^2)/(n_eg+n_cg-2)),
+      # Compute yi_dppc2
+      yi_dppc2 = metafor:::.cmicalc(n_eg+n_cg-2)*((m_t2_eg - m_t1_eg) - (m_t2_cg-m_t1_cg))
+                                    /sd_pool,
+      # add correlations pre-post 
+      r_high=.8,      # high correlation
+      r_mediumh=.6,   # medium-high correlation
+      r_mediuml=.4,   # medium-low correlation
+      r_low=.2)%>%    # low correlation
+    
     # Rearrange dataset from wide format to long format
-    gather("r_high":"r_low", key="r_size",value="r_value", factor_key = TRUE)  
-  
-  # compute variance
-  data<-data%>%
-    mutate(vi_dppc2=2*(1-r_value)*(1/n_eg + 1/n_cg)+ yi_dppc2^2/(2*(n_eg + n_cg)))
-  
-  # ordering dataset
-  data<-data%>%
-    arrange(study,n_effect,r_size)
-  
-  
+    gather("r_high":"r_low", key="r_size",value="r_value", factor_key = TRUE)%>%  
+    # compute variance
+    mutate(vi_dppc2=2*(1-r_value)*(1/n_eg + 1/n_cg)+ yi_dppc2^2/(2*(n_eg + n_cg)))%>%
+    arrange(study,n_effect,r_size)  # ordering dataset
 }
-
-
 #----    rm_hung function    ----
 
 # We remove the second effect in Hung et al. (2014) because evident problems.
@@ -122,18 +116,13 @@ compute_dppc2 <- function(data){
 # That is probably given by the fact that the measure used was not able to
 # evaluate properly the variation among individuals (floor effect)
 
+#----    rm_hung    ----
 rm_hung <- function(data){
-
-  #----    rm_hung    ----
-  
-  # Remove effect
-  data<-data%>%
+  data%>%
     filter(study!= "13" | n_effect!=2)
-  #----
-  return(data)
-}
+  }
 
-#----    data_aggregated    ----
+#----    aggregated_data_function   ----
 
 # Obtain dataset with aggregate effects within studies 
 # using MAd::agg function and setting method="BHHR" raccomanded by 

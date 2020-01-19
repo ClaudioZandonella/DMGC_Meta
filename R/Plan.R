@@ -18,6 +18,7 @@ plan <- drake_plan(
   # Remove 2° effect Hung et al.
   data = rm_hung(data_effect),
   
+  
   #----    Descriptive Statistics    ----
   
   # Table n effects for studies
@@ -26,9 +27,9 @@ plan <- drake_plan(
   # Plot n studies according to publication year
   plot_publication_year = publication_year(data),
   
-  # Frequencies studies according to publication, school-grade
+  # Frequencies studies according to publication, school-grade, device
   table_freq = target(freq_table(data, var_name = ddd),
-                      transform = map(ddd=c(pub,grade))),
+                      transform = map(ddd=c(pub,grade,device))),
   
   # Frequencies studies according  to weeks
   table_freq_weeks = freq_table_weeks(data),
@@ -50,15 +51,7 @@ plan <- drake_plan(
   # forest plot
   
   plot_forest = forest_plot(fit_rma_mv),
-  
-  #----    Meta-analysis data_aggregated    ----
-  
-  # Obtain data with aggregate effect sizes using Borenstein formula
-  data_aggregated = aggregate_data(data, cor = .5, method = "BHHR"),
-  
-  # Random-effect meta-analysis with aggregated effects
-  fit_rma = rma(yi = yi_dppc2, vi = vi_dppc2, method = "REML",
-                data = data_aggregated, slab = author_y),
+
   
   #----    Sensitivity correlations    ----
   
@@ -87,6 +80,7 @@ plan <- drake_plan(
   
   # Plot results sensitivity correlations analysis
   plot_sens_summary = sens_summary_plot(sens_summary),
+  
   
   #----    Sensitivity leave-one-out    ----
   
@@ -119,6 +113,49 @@ plan <- drake_plan(
   plot_cook=sens_cook_plot(sens_cook_summary),
   
   
+  #-----   Robumeta analysis    ----
+  
+  # Robust Variance Analysis results
+  fit_robumeta = robumeta::robu(yi_dppc2~1, data=data%>%filter(r_size=="r_mediumh"), 
+                                modelweights = "CORR", studynum = study,
+                                var.eff.size = vi_dppc2, small=TRUE, rho=.5),
+  
+  
+  #----    Meta-analysis data_aggregated    ----
+  
+  # Obtain data with aggregate effect sizes using Borenstein formula
+  data_aggregated = aggregate_data(data, cor = .5, method = "BHHR"),
+  
+  # Random-effect meta-analysis with aggregated effects
+  fit_rma = rma(yi = yi_dppc2, vi = vi_dppc2, method = "REML",
+                data = data_aggregated, slab = author_y),
+  
+  
+  #----    Publication-bias    ---- 
+  
+  # Funnel plot multilevel meta-analysis
+  funnel_plot = funnel(fit_rma_mv),
+  
+  # Egger's regression test considering study sample size or 
+  # variance effect as predictors
+  
+  egger_regression = target(
+    rma_multilevel(data, r_pre_post = "r_mediumh",r_outocomes = .5,
+                   moderator = moderator_value),
+    # Define an analysis target for each moderator
+    transform = map(moderator_value = c("N", "vi_dppc2"))
+  ),
+  
+  # Rank correlation test  observed outcomes and the corresponding sampling variances
+  rank_test = ranktest(fit_rma_mv),
+  
+  # Funnel plot meta-analysis aggregated effect with trim-and-fill
+  trim_fill_aggregated = trimfill(fit_rma),
+  
+  funnel_plot_aggregated = funnel(trim_fill_aggregated),
+  
+  
+  
   #----    Moderator-Analysis    ----
   
   # Fit separate multilevel meta-analysis for each moderator
@@ -136,25 +173,6 @@ plan <- drake_plan(
     transform = map(mod_rma_mv)),
   
   
-  #----    Publication-bias    ---- 
-  
-  # Funnel plot multilevel meat-analysis
-  funnel_plot = funnel(fit_rma_mv),
-  
-  # Funnel plot meta-analysis aggregated effect with trim-and-fill
-  trim_fill_aggregated = trimfill(fit_rma),
-  
-  funnel_plot_aggregated = funnel(trim_fill_aggregated),
-  
-  # Egger's regression test considering study sample size or 
-  # variance effect as predictors
-  
-  egger_regression = target(
-    rma_multilevel(data, r_pre_post = "r_mediumh",r_outocomes = .5,
-                       moderator = moderator_value),
-    # Define an analysis target for each moderator
-    transform = map(moderator_value = c("N", "vi_dppc2"))
-  )
   
   #----    Report Analysis    ----
   #report_analysis = knitr_in("Report_analysis/Report_analysis.Rnw")

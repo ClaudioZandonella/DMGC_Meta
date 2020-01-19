@@ -24,5 +24,17 @@ get_legend<-function(a_gplot){
   legend <- tmp$grobs[[leg]]
   return(legend)}
 
+#-----    mutate_cond    ----
 
+# mutate_cond create a simple function for data frames or data tables 
+# that can be incorporated into pipelines. 
+# This function is like mutate but only acts on the rows satisfying the condition.
+
+# https://stackoverflow.com/questions/34096162/dplyr-mutate-replace-several-columns-on-a-subset-of-rows
+
+mutate_cond <- function(.data, condition, ..., envir = parent.frame()) {
+  condition <- eval(substitute(condition), .data, envir)
+  .data[condition, ] <- .data[condition, ] %>% mutate(...)
+  .data
+}
 #----    
