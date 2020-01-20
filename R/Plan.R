@@ -27,9 +27,9 @@ plan <- drake_plan(
   # Plot n studies according to publication year
   plot_publication_year = publication_year(data),
   
-  # Frequencies studies according to publication, school-grade, device
+  # Frequencies studies according to publication, school-grade, device, dependence
   table_freq = target(freq_table(data, var_name = ddd),
-                      transform = map(ddd=c(pub,grade,device))),
+                      transform = map(ddd=c(pub,grade,device,dependence))),
   
   # Frequencies studies according  to weeks
   table_freq_weeks = freq_table_weeks(data),
@@ -52,6 +52,22 @@ plan <- drake_plan(
   
   plot_forest = forest_plot(fit_rma_mv),
 
+  #-----   Robumeta_analysis    ----
+  
+  # Robust Variance Analysis results
+  fit_robumeta = rva_meta(data),
+
+  #----    Meta-analysis data_aggregated    ----
+  
+  # Obtain data with aggregate effect sizes using Borenstein formula
+  data_aggregated = aggregate_data(data, cor = .5, method = "BHHR"),
+  
+  # Random-effect meta-analysis with aggregated effects
+  fit_rma = rma(yi = yi_dppc2, vi = vi_dppc2, method = "REML",
+                data = data_aggregated, slab = author_y),
+  
+  
+  
   
   #----    Sensitivity correlations    ----
   
@@ -78,6 +94,9 @@ plan <- drake_plan(
     transform = combine(summary_sens) 
   ),
   
+  # Get min, max and mean of the results
+  table_sens_summary = table_sens_results(sens_summary),
+  
   # Plot results sensitivity correlations analysis
   plot_sens_summary = sens_summary_plot(sens_summary),
   
@@ -103,6 +122,9 @@ plan <- drake_plan(
     transform = combine(summary_sens_loo) 
   ),
   
+  # Get min, max and mean of the results
+  table_loo_summary = table_sens_results(sens_loo_summary),
+  
   # Plot summary sensitivity loo
   plot_sens_loo = sens_loo_plot(sens_loo_summary, fit_rma_mv, data),
   
@@ -111,24 +133,6 @@ plan <- drake_plan(
   
   #  Plot Cook's distances
   plot_cook=sens_cook_plot(sens_cook_summary),
-  
-  
-  #-----   Robumeta analysis    ----
-  
-  # Robust Variance Analysis results
-  fit_robumeta = robumeta::robu(yi_dppc2~1, data=data%>%filter(r_size=="r_mediumh"), 
-                                modelweights = "CORR", studynum = study,
-                                var.eff.size = vi_dppc2, small=TRUE, rho=.5),
-  
-  
-  #----    Meta-analysis data_aggregated    ----
-  
-  # Obtain data with aggregate effect sizes using Borenstein formula
-  data_aggregated = aggregate_data(data, cor = .5, method = "BHHR"),
-  
-  # Random-effect meta-analysis with aggregated effects
-  fit_rma = rma(yi = yi_dppc2, vi = vi_dppc2, method = "REML",
-                data = data_aggregated, slab = author_y),
   
   
   #----    Publication-bias    ---- 

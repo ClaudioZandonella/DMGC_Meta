@@ -63,14 +63,41 @@ pareto_post <- function(data){
                 sd_t2_eg = sqrt(sd_t1_eg^2+sd_gain_eg^2))
   }
 
+#----    compute_N_study    ----
+
+# Compute the total number of participants in the studies
+
+compute_N_study <-  function(data){
+ 
+  # Ke(2006) - independent groups
+  N_ke2006 = data%>%
+    filter(id=="961" & !duplicated(id_effect))%>%
+    select(n_cg,n_eg)%>%
+    sum()
+  
+  # Ke(2008) - multiple experimental groups 
+  N_ke2008 = data%>%
+    filter(id=="432" & !duplicated(id_effect))%>%
+    select(n_cg,n_eg)%>%
+    summarise(n_cg=n_cg[1],
+              n_eg=sum(n_eg))%>%
+    sum()
+  
+  data%>%
+    mutate(N_study = N)%>%
+    mutate_cond(id=="961", N_study=N_ke2006)%>%
+    mutate_cond(id=="432", N_study=N_ke2008)
+}
+
 #----    munge_data   ----
 
 munge_data <- function(data){
   
   data %>%
     clean_data() %>%
-    pareto_post()
-
+    pareto_post() %>%
+    compute_N_study()
+  
 }
 
 #----    compute_dppc2 function    ----
@@ -128,6 +155,8 @@ rm_hung <- function(data){
 # using MAd::agg function and setting method="BHHR" raccomanded by 
 # Hoyt & Del Re (2017): https://doi.org/10.1080/10503307.2017.1405171
 
+#----    aggregated_data    ----
+
 aggregate_data = function (data, r_pre_post="r_mediumh", cor=.5,
                            method="BHHR"){
   selected_data = data%>%
@@ -152,7 +181,7 @@ aggregate_data = function (data, r_pre_post="r_mediumh", cor=.5,
   
   return(data_aggregated)
 }
-
+#----
 
 
 
@@ -201,7 +230,8 @@ freq_table <- function(data, var_name){
   data%>%
     filter(!duplicated(id))%>%
     group_by(!!var_name)%>%
-    count()
+    count()%>%
+    ungroup()
 
 }
 
@@ -218,7 +248,8 @@ freq_table_weeks <- function(data){
                                        if_else(weeks<=10,"10 weeks or less","more than 10 weeks"))),
            week_groups=factor(week_groups,levels=c("1 week","4 weeks or less","10 weeks or less","more than 10 weeks")))%>%
     group_by(week_groups)%>%
-    count()
+    count()%>%
+    ungroup()
   }
 
 #----    plot_participants_studies -----
@@ -226,28 +257,12 @@ freq_table_weeks <- function(data){
 # Plot number of participants for each study
 
 participants_studies <- function(data){
-  # Compute the total number of participants in 
-  # Ke(2006) - independent groups
-  N_ke2006 = data%>%
-    filter(id=="961" & !duplicated(id_effect))%>%
-    select(n_cg,n_eg)%>%
-    sum()
-  
-  # Ke(2008) - multiple experimental groups 
-  N_ke2008 = data%>%
-    filter(id=="432" & !duplicated(id_effect))%>%
-    select(n_cg,n_eg)%>%
-    summarise(n_cg=n_cg[1],
-              n_eg=sum(n_eg))%>%
-    sum()
   
   data%>%
     filter(!duplicated(id))%>%
-    mutate(N = ifelse(id=="961", N_ke2006, N),
-           N = ifelse(id=="432", N_ke2008, N),
-           author_y=reorder(author_y,N))%>%
+    mutate(author_y=reorder(author_y,N_study))%>%
     ggplot()+
-    geom_bar(aes(x=author_y, y=N),col="black", fill="lightblue",stat="identity")+
+    geom_bar(aes(x=author_y, y=N_study),col="black", fill="lightblue",stat="identity")+
     scale_y_continuous(breaks = seq(from=0, to=1200, by=150))+
     theme(axis.text.x = element_text(angle = 45, hjust=1))+
     xlab("Study")+
@@ -265,10 +280,11 @@ effects_participants <- function(data){
   my_breaks = c(50, 100, 200, 400,1000)
   data%>%
     filter(r_size=="r_mediumh")%>%
-    mutate(author_y=reorder(author_y,N))%>%
+    mutate(author_y=reorder(author_y,N_study),
+           SE =1.96*sqrt(vi_dppc2))%>%
     ggplot()+
-    geom_point(aes(x=author_y, y=yi_dppc2, col=N, size=N),position= position_dodge2(.5))+
-    geom_errorbar(aes(ymin=yi_dppc2-vi_dppc2, ymax=yi_dppc2+vi_dppc2,x=author_y, col=N),
+    geom_point(aes(x=author_y, y=yi_dppc2, col=N_study),position= position_dodge2(.5))+
+    geom_errorbar(aes(ymin=yi_dppc2-SE, ymax=yi_dppc2+SE,x=author_y, col=N_study/2),
                   position= position_dodge2(.5), width=.5)+
     scale_y_continuous(breaks = seq(from=-.5, to=1, by=.25))+
     scale_color_gradient(name = "Sample Size", trans = "log",
@@ -277,7 +293,7 @@ effects_participants <- function(data){
     scale_size_continuous(guide=FALSE)+
     xlab("Studies (ordered by sample size)")+
     ylab("Estimated Effect")+
-    theme(legend.position = c(.9,.88))+
+    theme(legend.position = c(.9,.83))+
     coord_flip()
   
 }
@@ -320,36 +336,40 @@ calc_vcv <- function(data) {
   v
 }
 
-#----    compute_vcv_matrix    ----
+#----    compute_vcv_matrix_function    ----
 
 # Compute variance covariance matrix for given correlation value
 # according to the type of dependecy between outcomes
 
+# Effect sizes in Ke (2008) are computed with different treatment group but same control group
+# Gleser & Olkin (2009) provide formula to compute variance of Cohen's d considering
+# this dependence (see "gleser2009" section). However, formula are unknown for dppc2.
+# Thus, Ke (2008) effects are considered correlated as multiple outcomes varying correlation.
+
+# To compute values using Gleser & Olkin (2009) formula uncomment the following line
+# cov_dppc2[[3]] = calc_vcv(data[data$study==3,])
+
+#----    compute_vcv_matrix    ----
 compute_vcv_matrix <- function(data, r=.5){
   
   # Considering all effects correlated
-  cov_dppc2= with(data,clubSandwich::impute_covariance_matrix(
-    vi = vi_dppc2, cluster =study, r = r))
+  cov_dppc2= with(data, clubSandwich::impute_covariance_matrix(vi = vi_dppc2, 
+                                                               cluster =study, r = r))
   
   # Effect sizes in Ke (2006) are independent so we set covariances to 0
-  cov_dppc2[[2]] = cov_dppc2[[2]]*diag(1,3,3)
-  
-  # Effect sizes in Ke (2008) are computed with different treatment group but same control group
-  # Gleser & Olkin (2009) provide formula to compute variance of Cohen's d considering
-  # this dependence (see "gleser2009" section). However, formula are unknown for dppc2.
-  # Thus, Ke (2008) effects are considered correlated as multiple outcomes varying correlation.
-  
-  # To compute values using Gleser & Olkin (2009) formula uncomment the following line
-  # cov_dppc2[[3]] = calc_vcv(data[data$study==3,])
+  cov_dppc2[["2"]] = cov_dppc2[["2"]]*diag(1,3,3) # Study id is "2"
   
   return(cov_dppc2)
 }
 
-#----    rma_multilevel    ----
+#----    rma_multilevel_function    ----
 
 # Mulitlevel meta-analysis
 
+#----    rma_multilevel    ----
 rma_multilevel <-  function(data, r_pre_post="r_mediumh", r_outocomes=.5, excluded_study=NULL, moderator=NULL){
+  
+  # Filter data
   data = data%>%
     filter(r_size==r_pre_post)
   
@@ -401,11 +421,12 @@ forest_plot <- function(fit_rma_mv){
               ci = paste0("[",format(round(yi_dppc2-1.96*sqrt(vi_dppc2),2),2),
                           ";",format(round(yi_dppc2+1.96*sqrt(vi_dppc2),2),2),"]"),
               yi_dppc2 = format(round(yi_dppc2, 2),2))
-    
-  forest(fit_rma_mv, slab =labels$autor_y, xlim=c(-2.5,3),ilab=labels[,-1],
+  
+  par(mar = c(4, 0, 0, 0))
+  forest(fit_rma_mv, slab =labels$autor_y, xlim=c(-3,3),ilab=labels[,-1],
          ilab.pos=2, ilab.xpos=c(-1,1.8,3,2.3), annotate = F)
   
-  text(-2.5,44, "Author(s) and Year",  pos=4,font=2)
+  text(-3,44, "Author(s) Year",  pos=4,font=2)
   text(-1.1,44, "Effect",font=2)
   text(3,44,"[95\\% CI]",font=2,pos=2)
   text(3,-1,paste0("[",round(fit_rma_mv$ci.lb,2),";",
@@ -420,6 +441,15 @@ forest_plot <- function(fit_rma_mv){
 }
 
 
+
+#----    rva_meta    ----
+rva_meta <- function(data){
+  # Robust Variance Analysis
+  robumeta::robu(yi_dppc2~1, data=data%>%filter(r_size=="r_mediumh"), 
+                 modelweights = "CORR", studynum = study,
+                 var.eff.size = vi_dppc2, small=TRUE, rho=.5)
+}
+#----
 ########################################
 ####    Sensitivity correlations    ####
 ########################################
@@ -460,6 +490,26 @@ summarize_fit_rma_mv<- function(fit_rma_mv){
   return(summary_fit_rma_mv)
 }
 
+
+#----    table_sens_results    ----
+
+# Compute min, max, an mean value of the results of the sensitivity analysis
+
+table_sens_results <- function(sens_summary){
+  col_names = c("sigma2","sigma","sigma_lb","sigma_ub","QE","I_squared","beta","SE","beta_lb","beta_ub")
+  
+  sens_summary=cbind(sens_summary, 
+                     compute_CI(estimate = "beta", SE = "SE", data=sens_summary))
+  
+  min = apply(sens_summary[,col_names],2,min)
+  max = apply(sens_summary[,col_names],2,max)
+  mean = apply(sens_summary[,col_names],2,mean)
+  names = names(sens_summary[,col_names])
+  
+  res = data.frame(names,min,mean,max, row.names = NULL)
+  return(res)
+}
+
 #----    sens_summary_plot    ----
 
 # Plot summary information about the sensitivity analysis
@@ -482,7 +532,7 @@ sens_summary_plot <- function(sens_summary){
     scale_shape_discrete(name = legend_title, labels = legend_labels)+
     scale_linetype_discrete(name = legend_title, labels = legend_labels)+
     labs(x="Correlation between outcomes",
-         y="Sigma",
+         y="$\\sigma$",
          legend="Correlation pre-post score")+
     theme(legend.position = "top")
   
@@ -492,15 +542,16 @@ sens_summary_plot <- function(sens_summary){
     geom_line(aes(x=r_outcomes, y=beta, col=r_pre_post,linetype=r_pre_post))+
     scale_x_continuous(breaks = seq(from=0.1, to=.9, by=.1))+
     labs(x="Correlation between outcomes",
-         y="Beta")+
+         y="$d_{ppc2}$")+
     theme(legend.position = "none")
   
   p3 = ggplot(sens_summary)+
     geom_point(aes(x=r_outcomes, y=I_squared, col=r_pre_post, shape=r_pre_post))+
     geom_line(aes(x=r_outcomes, y=I_squared, col=r_pre_post, linetype=r_pre_post))+
     scale_x_continuous(breaks = seq(from=0.1, to=.9, by=.1))+
+    scale_y_continuous(breaks = c(60,70,80,90),labels = c("60\\%","70\\%","80\\%","90\\%"))+
     labs(x="Correlation between outcomes",
-         y="I^2")+
+         y="$I^2$")+
     theme(legend.position = "none")
   
   legend = get_legend(p1)
@@ -508,7 +559,6 @@ sens_summary_plot <- function(sens_summary){
   gridExtra::grid.arrange(p1+theme(legend.position = "none"),
                p2,p3,legend,
                ncol=1, heights=c(6,6,6,1))
-  
 }
 
 
@@ -521,8 +571,8 @@ sens_summary_plot <- function(sens_summary){
 
 # Plot results of sensitivity leave one out analysis
 
-sens_loo_plot <- function(sens_loo_summary, fit_rma_mv, data, label_I_squared = "I^2",
-                          label_dppc2 = "dppc2", label_ci = "95\\%CI"){
+sens_loo_plot <- function(sens_loo_summary, fit_rma_mv, data, label_I_squared = "$I^2$",
+                          label_dppc2 = "$d_{ppc2}$", label_ci = "95\\%CI"){
   
   # Add original results when all studies are considered
   original_results = summarize_fit_rma_mv(fit_rma_mv)
@@ -530,7 +580,7 @@ sens_loo_plot <- function(sens_loo_summary, fit_rma_mv, data, label_I_squared = 
   sens_loo_summary%>%
     bind_rows(original_results)%>%
     mutate(author_y =c(unique(data$author_y),"Original result"),
-           lab_I_squared=round(I_squared,0),
+           lab_I_squared=paste0(round(I_squared,0),"\\%"),
            lab_beta=round(beta,2),
            lab_ci_lb=beta-1.96*SE,
            lab_ci_ub=beta+1.96*SE,

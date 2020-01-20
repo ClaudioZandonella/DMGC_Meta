@@ -46,6 +46,7 @@ readd(table_freq_pub)
 readd(table_freq_grade)
 readd(table_freq_device)
 readd(table_freq_weeks)
+readd(table_freq_dependence)
 readd(plot_participants_studies)
 readd(plot_effects_participants)
 readd(table_freq_mot)
@@ -67,11 +68,13 @@ summary(fit_rma)      # summary
 
 # Sensitivity correlations
 loadd(sens_summary)
+loadd(table_sens_summary)
 loadd(plot_sens_summary)
 plot(plot_sens_summary)
 
 # Sensitivity leave-one-out
 loadd(sens_loo_summary)
+loadd(table_loo_summary)
 readd(plot_sens_loo)
 loadd(sens_cook_summary)
 readd(plot_cook)

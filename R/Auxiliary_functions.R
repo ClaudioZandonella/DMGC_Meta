@@ -3,11 +3,12 @@
 ###################################
 
 
-#----    I_squared    ----
+#----    I_squared_function    ----
 
 # compute I squared using formula reported in
 # http://www.metafor-project.org/doku.php/tips:i2_multilevel_multivariate (section: Multilevel Models)
 
+#----    I_squared    ----
 I_squared<-function(model){
   W <- diag(1/model$vi)
   X <- model.matrix(model)
@@ -37,4 +38,21 @@ mutate_cond <- function(.data, condition, ..., envir = parent.frame()) {
   .data[condition, ] <- .data[condition, ] %>% mutate(...)
   .data
 }
+
+#------    compute_CI    ----
+
+# Compute 95% CI given estimated value and SE
+compute_CI <- function(estimate, SE, data){
+  col_estimate = match(estimate,names(data))
+  col_SE = match(SE,names(data))
+  names = paste0(estimate,c("_lb","_ub"))
+  
+  CI = data.frame(lb= data[,col_estimate] - 1.96* data[,col_SE],
+                  ub= data[,col_estimate] + 1.96* data[,col_SE])
+  
+  names(CI)=names
+  
+  return(CI)
+}
+
 #----    
