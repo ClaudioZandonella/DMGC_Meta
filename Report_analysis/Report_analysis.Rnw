@@ -69,7 +69,7 @@ knitr::opts_chunk$set(echo = FALSE,
                       dev = "tikz", dev.args=list(pointsize=12),fig.align='center',
                      # fig.height=3, fig.width=5,
                       # Code output width
-                      tidy=TRUE, tidy.opts = list(width.cutoff = 88), options(width=88),
+                      tidy=TRUE, tidy.opts = list(width.cutoff = 87),
                       # Cache options
                       cache = TRUE, autodep=TRUE)
 
@@ -87,7 +87,9 @@ system (paste ("biber", sub ("\\.Rnw$", "", current_input())))
 library("tidyverse")
 library("knitr")
 library("kableExtra")
+library("metafor")
 library("drake")
+library("robumeta")
 
 # Option KableExtra
 options(knitr.kable.NA = '')
@@ -97,12 +99,75 @@ theme_set(theme_classic()+
           theme(text = element_text(size=12)))
 
 knitr::read_chunk("../R/Functions.R")
+source("../R/Functions.R") # defines functions
+source("../R/Auxiliary_functions.R") # Auxiliary functions
 
+#----    load drake results    ----
 
-# load drake results
+# Data
 loadd(data_raw)
 loadd(data_effect)
 loadd(data)
+
+# Descriptive statistics
+loadd(table_n_effects_studies)
+loadd(table_freq_pub)
+loadd(table_freq_grade)
+loadd(table_freq_device)
+loadd(table_freq_weeks)
+loadd(table_freq_dependence)
+loadd(table_freq_mot)
+
+# Multilevel meta-analysis
+loadd(fit_rma_mv)
+loadd(plot_forest)
+
+# Romubeta analysis
+loadd(fit_robumeta)
+
+# Meta-analysis data_aggregated
+loadd(fit_rma)
+
+# Sensitivity correlations
+loadd(sens_summary)
+loadd(table_sens_summary)
+loadd(plot_sens_summary)
+
+# Sensitivity leave-one-out
+loadd(table_loo_summary)
+loadd(sens_cook_summary)
+loadd(plot_cook)
+
+
+#-----    Labels    ----
+
+# Labels
+
+label_grade = c("Primary school","Secondary school")
+label_dependece = c("Independent experimental and control groups", "Independent experimental groups same control", "Multiple outcaomes on same participants","Single effect")
+label_mot = c("Expectancy", "Value", "Not differentiated")
+
+label_author_y_n_old =  data%>%
+  arrange(N_study)%>%
+  select(author_y)%>%
+  unique()
+
+label_author_y =  data%>%
+  select(author_y)%>%
+  unique()%>%
+  mutate(author_y = recode(author_y,
+    `Miller and Robertson (2011)` = "Miller \\& Robertson (2011)",
+    `Main and O'Rourke (2011)` = "Main \\& O'Rourke (2011)",
+    `Miller and Robertson (2010)` = "Miller \\& Robertson (2010)"))
+
+label_author_y_n_new =  data%>%
+  arrange(N_study)%>%
+  select(author_y)%>%
+  unique()%>%
+  mutate(author_y = recode(author_y,
+    `Miller and Robertson (2011)` = "Miller \\& Robertson (2011)",
+    `Main and O'Rourke (2011)` = "Main \\& O'Rourke (2011)",
+    `Miller and Robertson (2010)` = "Miller \\& Robertson (2010)"))
 @
   
   
@@ -178,6 +243,7 @@ The analysis report is divided into different sections:
     \item{\textbf{Section~\ref{sec:Statistical_Approach}:} the statistical approach and the plan of analysis are presented.}
     \item{\textbf{Section~\ref{sec:Data_Preparation}:} the dataset is presented with a brief description of each variable and prepared for the analysis.}
     \item{\textbf{Section~\ref{sec:Descriptive_Statistics}:} the descriptive statistics are presented.}
+    \item{\textbf{Section~\ref{sec:Meta-Analysis_Results}:} the results of the meta-analysis are described.}
 \end{itemize}
 
 \newpage
@@ -272,13 +338,11 @@ Next, descriptive statistics are presented to evaluate the main charateristics o
 
 Multilevel meta analysis is conduct using the restricted maximum likelihood method with the R-package \texttt{metafor} \parencite{viechtbauerConductingMetaanalysesMetafor2010}. Variance-covariance matrix is defined for each study according to the specific outcomes dependece structure. However, studies with multiple measure on the same subjects did not reported the correlation between outcomes needed to specify dependence structure. In these cases, variance-covariance matrix is computed with different correlation values and their influece on the meta-analysis results will be subsequently evaluated. Results are presented and heterogeneity between studies is assesed through inspection of forest plot and evaluation of the Q-statistic \parencite{hedgesStatisticalMethodsMetaanalysis2014}. Under the null hypothesis, the Q-statistic is distributed as a chi-square with degrees of freedom equal to the number of studies minus one. A significant chi-value indicates the presence of heterogeneity across studies. Moreover, to estimate the magnitude of the heterogeneity the $I^2$ index is reported \parencite[i.e., the proportion of observed variance that reflects real and not random difference between studies effect sizes;][]{borensteinIntroductionMetaanalysis2009}. High values of $I^2$ suggest that differences between results are related to real differences across studies (i.e., different constructs or different study design). On the contrary, low values of $I^2$ suggest that results across studies are similar and possible differences are related to random sampling.
 
+Next, we present the alternative results obtained using the different meta-analitic approaches presented above, which are robust variance estimation (RVE) approach and averaging effect sizes approach. RVE is conducted using the R-package \texttt{robumeta} \parencite{fisherRobumetaRpackageRobust2015, fisherRobumetaRobustVariance2017} considering a correlated effects dependence structure. Averaged effect sizes are obtained acording to \textcite{borensteinIntroductionMetaanalysis2009} indiations as implemented in the R-package \texttt{MAd} \parencite{delreMAdMetaanalysisMean2014}.
 
 To investigate robustness of the results, a sensitivity analysis is conducted to evaluate how the values of the correlation between pre-test and post-test scores and the values of the correlation between dipendent outcomes influece the meta analysis results. Moreover, a \textit{Leave-One-Out} (LOO) sensitivity analysis considering the study grouping level is run to assess the possible presence of influencial studies. Substantial changes when a single study is removed would be interpreted as lack of homogeneity and unreliable results \parencite{viechtbauerOutlierInfluenceDiagnostics2010}.
 
-Next, we present the alternative results obtained using the different meta-analitic approaches presented above, which are robust variance estimation (RVE) approach and averaging effect sizes approach. RVE is conducted using the R-package \texttt{robumeta} \parencite{fisherRobumetaRpackageRobust2015, fisherRobumetaRobustVariance2017} considering a correlated effects dependence structure. Averaged effect sizes are obtained acording to \textcite{borensteinIntroductionMetaanalysis2009} indiations as implemented in the R-package \texttt{MAd} \parencite{hoytMAdMetaanalysisMean2014}.
-
-Subsequently, publication bias is assessed. To our knowledge, there are no specific methods designed to correctly evaluate pubblication bias in a multilevel meta-analysis. Funnel plot is presented as a graphical representation of the simmetry of the effects distribution. However, this is not optimal as studies with multiple effects are overrepresented in the plot respect to studies with only one effect. To overcome this issue, we conduct separetly two Egger’s regression tests to evaluate if effect sizes are associated to sample size or sampling variance of the estimated effect. In the absence of publication bias, the regression coefficient is expected to be zero
-\parencite{linQuantifyingPublicationBias2018, eggerBiasMetaanalysisDetected1997}. Moreover, the result of the rank correlation test is reported to examine whether the observed outcomes and the corresponding sampling variances are correlated \parencite{beggOperatingCharacteristicsRank1994}.
+Subsequently, publication bias is assessed. To our knowledge, there are no specific methods designed to correctly evaluate pubblication bias in a multilevel meta-analysis. Funnel plot is presented as a graphical representation of the simmetry of the effects distribution. However, this is not optimal as studies with multiple effects are overrepresented in the plot respect to studies with only one effect. To overcome this issue, we conduct separetly two Egger’s regression tests to evaluate if effect sizes are associated to sample size or sampling variance of the estimated effect. In the absence of publication bias, the regression coefficient is expected to be zero \parencite{linQuantifyingPublicationBias2018, eggerBiasMetaanalysisDetected1997}. Moreover, the result of the rank correlation test is reported to examine whether the observed outcomes and the corresponding sampling variances are correlated \parencite{beggOperatingCharacteristicsRank1994}.
 
 Alternatively, funnel plot with the \textit{trim-and-fill} method \parencite{duvalTrimFillSimple2000,rothsteinPublicationBiasMetaanalysis2005} is presented considering the aggregated effects.
 
@@ -341,8 +405,8 @@ In the folder \texttt{Data/}, you can find the file \texttt{Dataset.csv} with al
   \item{\texttt{study}} - Numerical variable that indicates the id number of the study. This id number is used in the analysis to refer to a specific study. Values range from \texttt{1} to \texttt{19}.
   \item{\texttt{id}} - Numerical variable that indicates the id number of the study used during the selection process of elegible studies.
   \item{\texttt{author}} - Character string with the names of the authors.
-  \item{\texttt{year}} - Numerical variable that indicates the year of pubblication.\footnote{In the case of unpublished studies or grey-litterature the year refears to the realization of the study}.
-  \item{\texttt{pub}} - Character string that indicates if the study is pubblished (\texttt{yes}) or unpublished/ grey-litterature (\texttt{no}).
+  \item{\texttt{year}} - Numerical variable that indicates the year of pubblication.\footnote{In the case of unpublished dissertations or grey-litterature the year refears to the realization of the study}.
+  \item{\texttt{pub}} - Character string that indicates if the study is pubblished in peer-reviewed journal (\texttt{yes}) or conferece papers and unpublished dissertations (\texttt{no}).
   \item{\texttt{grade}} - Numerical variable that indicates school grade of the participants. Primary school is idicated with \texttt{1} and secondary school is idicated with \texttt{2}.
   \item{\texttt{weeks}} -  Numerical variable that indicates the lenght of the treatment in weeks.
   \item{\texttt{sessions}} - Numerical variable that indicates the total number of sessions of the treatment.
@@ -389,6 +453,7 @@ In \textcite{paretoTeachableAgentArithmeticGame2011} the gain scores (i.e., the 
 
 %------------------------
 \subsection{Compute $d_{ppc2}$ value and variance}
+\label{sec:effect_variance}
 
 To compute the $d_{ppc2}$ value and variance, we use the functions reported in the \texttt{metafor} website (\url{http://www.metafor-project.org/doku.php/analyses:morris2008}). To compute the variance we need the correlation between pre-test and post-test scores. However, correlation are not reported so we try with different values high correlation (\texttt{r\_high = .8}), medium-high correlation (\texttt{r\_mediumh = .6}), medium-low correlation (\texttt{r\_mediuml = .4}), and low correlation (\texttt{r\_low = .2}).
 
@@ -410,7 +475,7 @@ show_hung
 
 Considering the measure in the pre-test we can understan the problem. The standard deviation in the pre-tes are extremly low: \Sexpr{show_hung%>%filter(id_effect==33)%>%select(starts_with("sd_t1"))%>%round(.,2)%>%paste(., collapse=" and ")}. This leads to a low value for the pooled standard deviation and in turns an unplausible high value of effect size. That is probably given by the fact that the measure used was not able to evaluate properly the variation among individuals in the pre-test, (maybe floor effect).
 
-We do not include this effect in the meta-analysis and we remove it from the dataset. Thus the final dataset includes \Sexpr{length(unique(data$study))}
+We do not include this effect in the meta-analysis and we remove it from the dataset. Thus the final dataset includes \Sexpr{length(unique(data$id_effect))} different effects.
 
 <<rm_hung, echo=TRUE, eval=FALSE>>=
 @
@@ -425,7 +490,290 @@ We do not include this effect in the meta-analysis and we remove it from the dat
 \section{Descriptive Statistics}
 \label{sec:Descriptive_Statistics}
 
+In this section we describe the main characteristics of the studies included in the meta-analysis. First we present descriptive statistics considering the study level, then we present descriptive statistics considering the effect sizes level.
 
+%------------------------
+\subsection{Studies characteristics}
+
+In the analysis we include \Sexpr{length(unique(data$study))} studies and \Sexpr{length(unique(data$id_effect))} different effects. Studies were published between \Sexpr{min(data$year)} and \Sexpr{max(data$year)} and most of the studies are pubblished after 2010. The number of studies according to year of pubblication is presented in Figure~\ref{fig:Plot_dist_year}.
+
+<<Plot_dist_year, fig.pos="H", fig.align="center", fig.height=3, fig.width=4, fig.cap="Number of studies according to year of pubblication ($n_{studies}=19$).", fig.scap="Number of studies according to year of pubblication">>=
+
+readd(plot_publication_year)
+@
+
+The majority of the studies were published in a peer reviewed journal, but \Sexpr{table_freq_pub$n[1]} studies were obtained from conference papers or unpublished dissertations (see Table~\ref{tab:Table_freq_pub}).
+
+\codestreach
+<<Table_freq_pub>>=
+cbind(table_freq_pub, type=c("Peer-reviewed journal","\\makecell[r]{Conference papers or \\\\dissertations}"))%>%
+  select("type", "n")%>%
+  kable("latex", booktabs=T,align = c("r","c"),col.names = c("Publication","Frequency"),caption = "Type of publication.",escape=F) %>%
+    row_spec(0,bold = T, align = "c") %>%
+  kable_styling(position = "center", latex_options = "HOLD_position")%>%
+  footnote(general = "$n_{studies}=19$",footnote_as_chunk = T,escape=F)
+@
+
+The total number of participants included in each study range from \Sexpr{min(data$N)} to \Sexpr{max(data$N)} and the majority of the studies included less than 150 participants. The number of participants for each study is presented in Figure~\ref{fig:Plot_dist_sample}
+
+<<Plot_dist_sample, fig.pos="H", fig.align="center", fig.height=5, fig.width=5, fig.cap="Number of participants included in each study ($n_{studies}=19$).", fig.scap="Number of participants included in each study">>=
+readd(plot_participants_studies)
+@
+
+
+The studies included in the meta-analysis differ according to the school grade of the participants. In more than a half of the studies, participants were primary school students and in the othere studies participants were secondary school students (see Table~\ref{tab:Table_freq_grade}).
+
+<<Table_freq_grade>>=
+table_freq_grade%>%
+  mutate(grade=recode(grade, Primary = "Primary school", Secondary = "Secondary school"))%>%
+  kable("latex", booktabs=T,align = c("r","c"),col.names = c("School grade","Frequency"),caption = "Participants school grade.",escape=F) %>%
+    row_spec(0,bold = T, align = "c") %>%
+  kable_styling(position = "center", latex_options = "HOLD_position")%>%
+  footnote(general = "$n_{studies}=19$",footnote_as_chunk = T,escape=F)
+@
+
+
+Considering the device used in the treatment, the large part of the studies used the Personal Computer. Only \Sexpr{table_freq_device%>%filter(device=="Console")%>%select(n)} studies used different type of console and \Sexpr{table_freq_device%>%filter(device=="App")%>%select(n)} studies involved the use of Applications (see Table~\ref{tab:Table_freq_device}).
+
+<<Table_freq_device>>=
+table_freq_device%>%
+  kable("latex", booktabs=T,align = c("r","c"),col.names = c("Device","Frequency"),caption = "Device used in the treatment.",escape=F) %>%
+    row_spec(0,bold = T, align = "c") %>%
+  kable_styling(position = "center", latex_options = "HOLD_position")%>%
+  footnote(general = "$n_{studies}=19$",footnote_as_chunk = T,escape=F)
+@
+
+The duration of the treatment range from \Sexpr{min(data$weeks)} week to \Sexpr{max(data$weeks)} weeks. In Table~\ref{tab:Table_freq_weeks} studies are grouped according to approxiamte duration of the treatment.
+
+<<Table_freq_weeks>>=
+table_freq_weeks%>%
+  kable("latex", booktabs=T,align = c("r","c"),col.names = c("Duration","Frequency"),caption = "Duration of treatment in weeks.",escape=F) %>%
+    row_spec(0,bold = T, align = "c") %>%
+  kable_styling(position = "center", latex_options = "HOLD_position")%>%
+  footnote(general = "Maximum value is 28 wees; $n_{studies}=19$",footnote_as_chunk = T,escape=F)
+@
+
+In Table~\ref{tab:Table_n_studies_effects} the frequency of studies according to the number of effects is reported. Th majority of the studies include only one effect, all the other studies include between 2 and 4 effects, except one study with 8 effects.
+
+
+<<Table_n_studies_effects>>=
+table_n_effects_studies%>%
+  select("n_effects","n_studies")%>%
+  kable("latex", booktabs=T,align = rep("c",2),col.names = c("Effects within study", "Number of studies"),caption = "Frequency of studies according to the number of effects.") %>%
+    row_spec(0,bold = T, align = "c") %>%
+  kable_styling(position = "center", latex_options = "HOLD_position")%>%
+  footnote(general = "$n_{studies}=19$; $n_{effects}=42$",footnote_as_chunk = T,escape=F)
+@
+
+Studies with multiple effect size differ according to the type of dependency between effects. In \Sexpr{table_freq_dependence%>%filter(dependence=="multiple_outcomes")%>%select(n)} studies outcomes where measured on the same participants. Only \Sexpr{table_freq_dependence%>%filter(dependence=="multiple_groups")%>%select(n)} study included multiple independent treatment groups compared to a single control group and another study included multiple independent treatment groups and independent control groups (see Table~\ref{rab:Table_freq_dependence}). 
+
+<<Table_freq_dependence>>=
+table_freq_dependence%>%
+  mutate(dependence = label_dependece)%>%
+  kable("latex", booktabs=T,align = c("r","c"),col.names = c("Dependency", "Frequency"),caption = "Type of dependency among effect sizes within the same study.") %>%
+  row_spec(0,bold = T, align = "c") %>%
+  kable_styling(position = "center", latex_options = "HOLD_position")%>%
+  footnote(general = "$n_{studies}=19$",footnote_as_chunk = T,escape=F)
+@
+
+%------------------------
+\subsection{Effect characteristics}
+
+In Figure~\ref{fig:Plot_dist_effects} the estimated effect sizes of each study are presented together with confidence intervals. The studies are ordered according to the total number of participans included and mulitple outcomes from the same study are grouped together. We can observe the high variability between effects and how with the incrising of the sample size effects tend to be smaller.
+
+<<Plot_dist_effects, fig.pos="H", fig.align="center", fig.height=4.8, fig.width=6, fig.cap="Estimated effect size according to number of participants ($n_{studies}=19$; $n_{effects}=42$).", fig.scap="Estimated effect size according to number of participants">>=
+readd(plot_effects_participants)
+@
+
+Considering the different measures of motivation, \Sexpr{table_freq_mot%>%filter(motivation=="expectation")%>%select(n)} effect sizes considered motivation in terms of expectancy and \Sexpr{table_freq_mot%>%filter(motivation=="value")%>%select(n)} effect sizes considered motivation in terms of value. The remaning effect sized did not tifferentiate between the two aspects (see Table~\ref{tab:Table_freq_mot}).
+
+<<Table_freq_mot>>=
+table_freq_mot%>%
+  mutate(motivation = label_mot)%>%
+  kable("latex", booktabs=T,align = c("r","c"),col.names = c("Motivation measure", "Frequency"),caption = "Effect sizes according to the type of motivation measure.") %>%
+  row_spec(0,bold = T, align = "c") %>%
+  kable_styling(position = "center", latex_options = "HOLD_position")%>%
+  footnote(general = "$n_{effects} = 42$",footnote_as_chunk = T,escape=F)
+@
+
+\newpage
+
+%----------------------------------------------------------------------------------%
+%--------------------------    Meta-Analysis Results     --------------------------%
+%----------------------------------------------------------------------------------%
+
+\section{Meta-Analysis Results}
+\label{sec:Meta-Analysis_Results}
+
+In this section, first we present the results of the meta-analysis. Then sensitivity analyses are performed to evaluate consistency of the results and the possible presence of pubblication bias. Finaly, moderators analysis is described.
+
+%------------------------
+\subsection{Main results meta-analysis}
+
+%-------------
+\subsubsection{Variance-covariance matrix}
+In order to compute a multilevel meta-analysis we need first to define for each study the variance-covariance matrix accordig to the specific dependence structure between effect sizes.
+
+As we have seen in Table~\ref{tab:Table_freq_dependence} only \Sexpr{table_freq_dependence%>%filter(dependence != "none")%>%select(n)%>%sum()} studies include multiple effect size. In the case of two outcomes (A and B) measured on the same subjects, the covariance between outcomes ($cov(AB)$) can be computed knowing the variance of the two outcomes ($\sigma_A^2$ and  $\sigma_B^2$) and their correlation ($\rho_{AB}$):
+\begin{equation}
+  cov(AB) = \rho_{AB}*\sigma_A\sigma_B.
+\end{equation}
+The same formula applies for each couple of outcomes when multiple outcomes were measured. The variance-covariance matrix ($\Sigma$) can be computed as the product between the diagonal matrix that includes the outcomes standard deviation ($diag(S)$) and the correlation matrix ($Corr$):
+\todo{Control notation}
+\begin{equation}
+   \Sigma =  diag(S)*Corr*diag(S).
+\end{equation}
+
+Howevere, none of the studies reteported the correlation between values. Thus, variance-covariance matrix is computed with a renge of different correlation values between outcomes and influece on the results is evaluated.
+
+To compute the variance-covariance matrix in all studies, we used the \texttt{impute\_covariance\_matrix()} function included in the R-package \texttt{clubSandwich} \parencite{pustejovskyClubSandwichClusterrobustSandwich2019}. Given an assumed correlation value, the vector with all variances, and the grouping variable (in this case \texttt{study} as effects are grouped within studies), this function returns a list with the variance-covariance matrix for each study.
+\Sexpr{table_freq_dependence%>%filter(dependence=="multiple_outcomes")%>%select(n)} studies outcomes where measured on the same participants. In the case of studies with only one effect, the \texttt{impute\_covariance\_matrix()} function returns a 1x1 matrix with sampling variance value.
+
+\textcite{ke2006computer} is the only study where multiple independent treatment groups were compared to a common control group. In this case, covariance has to be computed considering this type of dependency between effects. \textcite{gleserStochasticallyDependentEffect2009} provided the formula to correctly compute the variance and covariance values for cohen's d effect size when multiple experimental gorups are compared to a common control group\footnote{The implemented R-functions are documented on the \texttt{metafor} website (\url{http://www.metafor-project.org/doku.php/analyses:gleser2009})}. Howevere, to our knowledge, no formula is available in this case for the $d\_{ppc2}$ proposed by \textcite{morrisEstimatingEffectSizes2008}. Thus, we treat this study in the same way as studies with multiple measures on the same subjects. We allow correlation to vary in order to evaluate its influence on the results.
+
+Finnaly, \textcite{keAlternativeGoalStructures2008} is the only study where multiple independent treatment groups were compared to multiple independent control groups. In this case the correlation between outcomes is set to zero.
+
+We specify a function that given a correlation value computes and adjust the variance-covariance matrix for all studies according to dependency between effects.
+
+<<compute_vcv_matrix, echo=TRUE, eval=FALSE, tidy.opts=list(width.cutoff = 80)>>=
+@
+
+%-------------
+\subsubsection{Multilevel meta-analysis}
+
+Based on the \texttt{rma.mv()} function from \texttt{metafor} R-package, we define a function to fit the multilevel meta-analysis. First we filter the dataset considering a give pre- post-test correlation (\texttt{r\_pre\_post} can be set to \texttt{"r\_high"},\texttt{"r\_mediumh"}, \texttt{"r\_mediuml"}, \texttt{"r\_low"}) used to compute the effect sampling variance (\texttt{vi\_dppc2}, see Section~\ref{sec:effect_variance}). The variance-covariance matrix is computed accordin to a given correlation value between outcomes (\texttt{r\_outcomes}). Then, the Multilevel meta-analysi is fitted considerinc the study clusters as a random-effects (\texttt{random =  $\sim$ 1|study}).
+
+In the outcome we add the $I^2$ value computed following the functions presented on the \texttt{metafor} website (\url{http://www.metafor-project.org/doku.php/tips:i2_multilevel_multivariate}; see Section textit{"Multilevel Models"}) and the coefficient test using the \texttt{coef\_test} from \texttt{clubSandwich} R-package that applies small sample correction. The function includes also two extra arguments that allow to exlude single studies and define moderators. These settings will be used for LOO sensitivity analysis and moderator analysis.
+
+<<rma_multilevel, echo=TRUE, eval=FALSE, tidy.opts=list(width.cutoff = 73)>>=
+@
+
+Default settings consider \texttt{r\_pre\_post = "r\_mediumh"}, which means a correlation of 0.6, and \texttt{r\_outcomes = 0.5}. These are reasonable values reserachers would expect and the influence of different values on the results will be considered later. Below we report the output of the model \texttt{fit\_rma\_mv} based on default settings.
+
+<<fit_rma_mv_summary,echo=TRUE >>=
+summary(fit_rma_mv)
+@
+
+The model $I^2$ is \Sexpr{round(fit_rma_mv$I_squared,1)}\% and the coefficients test with small sample correction are reported in Table~\ref{tab:Table_coeff_fit_rma}
+<<Table_coeff_fit_rma>>=
+cbind(Coef="Intercept",
+      fit_rma_mv$coef_test,
+      sig="**")%>%
+  mutate_at(2:5, round,2)%>%
+  mutate_at(6, round, 4)%>%
+  kable("latex", booktabs=T,align = rep("c",7),col.names = c("Coefficient","Estimate","SE", "t-value","df","p-value", "Sig."),caption = "Coefficients test for \\texttt{fit\\_rma\\_mv}", row.names = FALSE) %>%
+  row_spec(0,bold = T, align = "c") %>%
+  kable_styling(position = "center", latex_options = "HOLD_position")%>%
+  footnote(general = "$n_{studies}=19$; $n_{effects}=42$",footnote_as_chunk = T,escape=F)
+@
+
+The results indicate that the treatments have a significant small-effect ($d_{ppc2} = \Sexpr{round(fit_rma_mv$coef_test[,1],2)}$). However, the confidence interval ($95\% CI = [\Sexpr{paste0(round(fit_rma_mv$ci.lb,2),"; ", round(fit_rma_mv$ci.ub,2))}]$) range from very small-effects to medium effects indicating that there is a high level of uncertanty in the estimation. Moreover, results show high levels of heterogeneity in the studies included in the meta-analysis. The Q-statistic is significant $Q(\text{df}=\Sexpr{fit_rma_mv$k-1}) = \Sexpr{round(fit_rma_mv$QE,2)}$ and $I^2$ value is high ($I^2 = \Sexpr{round(fit_rma_mv$I_squared,1)}$\%). The Forest plot is presented in Figure~\ref{fig:Plot_forest_fit_rma}.
+
+<<Plot_forest_fit_rma, fig.pos="!ht", fig.align="center", fig.height=8.5, fig.width=6.5, fig.cap="Forest plot of the multilevel meta-analysis ($n_{studies}=19$; $n_{effects}=42$).", fig.scap="Forest plot of the multilevel meta-analysis.">>=
+plot_forest
+@
+
+%-------------
+\subsubsection{Robust variance analysis}
+
+In order to evaluate the result we would obtain using the Robust Variance Analysi (RVA) approache, we fit a different model using the function \texttt{robu()} from the \texttt{robumeta} R-package. We consider spacify a correlated effects dependence structure for the analysis (\texttt{modelweights = "CORR"}) and the same correlation between outcomes as in the previous analysis (\texttt{rho=.5})
+
+<<rva_meta, echo=TRUE, eval=FALSE,tidy.opts=list(width.cutoff = 73)>>=
+@
+
+Results are presented below. Overall we have similar results to the previous analysis. The treatments effect is small and the heterogeneity between studies is high.
+
+<<rva_meta_summary>>=
+print(fit_robumeta)
+@
+
+%-------------
+\subsubsection{Aggregarted effects meta-analysis}
+
+In order to evaluate the result we would obtain averaging effects within studies, we conduct a separate meta-analysis. First, we compute the composite effect for each study using \texttt{agg()} function from \texttt{MAd} R-package \parencite{delreMAdMetaanalysisMean2014}. Following, \textcite{hoytEffectSizeCalculation2018} rcommendations, we set \texttt{method="BHHR"} to use the approach suggested by \textcite{borensteinIntroductionMetaanalysis2009} and we set correlation between outcomes at 0.5 as in the previous cases.
+<<aggregated_data, eval=F, echo=T, tidy.opts=list(width.cutoff = 73)>>=
+@
+
+Then, we fit a random-effects model meta-analysis using \texttt{rma()} function from \texttt{metafor} R-package. Results are presented below. Overall we have similar results to the previous analysis. The treatments effect is small and the heterogeneity between studies is high.
+
+<<agg_meta_fit>>=
+summary(fit_rma)
+@
+
+%------------------------
+\subsection{Sensitivity analyses}
+
+%------------------------
+\subsubsection{Sensitivity correlation values}
+
+To evaluate the influence of the correlation between pre-test and post-test scores (\texttt{r\_pre\_post}) and the influence of the correlation between outcomes (\texttt{r\_outcomes}), we run the multilevel meta-analysis trying different combination of values. The $d_{ppc2}$ sampling variance was previosly computed considing high values (\texttt{r\_pre\_post}=0.8), medium-high values (\texttt{r\_pre\_post}=0.6), medium.low values (\texttt{r\_pre\_post}=0.4), and low values (\texttt{r\_pre\_post}=0.2) for the pre- post-test correlation (see Section~\ref{sec:effect_variance}).
+
+For all conditions, several multilevel meta-analyses are run varying the correlation between outcomes used to compute the variance-covariance matrix. The sequence of values considered for the \texttt{r\_outcomes} range from 0.1 to 0.9 with increments of 0.1. Thus, in the sensitivity analysis \Sexpr{nrow(sens_summary)} different models are fitted.
+
+The results of each different combination are saved in the R-object \texttt{sens\_summary} that can be loaded using the \texttt{drake} function \texttt{loadd(sens\_summary)}. The summary results are reported in Table~\ref{tab:Table_sens_summary} and presented in Figure~\ref{fig:Plot_sens_summary} (in the plot 95\% CI are not represented as they are moslty overlapping and this would make the plot messy and difficult to interpret).
+
+<<Table_sens_summary>>=
+table_report_sens = table_sens_summary%>%
+  filter(names!="sigma2",names!="SE",names!="QE")%>%
+  mutate(names=factor(names, levels=c("sigma","sigma_lb","sigma_ub","beta","beta_lb","beta_ub","I_squared")))%>%
+  arrange(names)%>%
+  mutate(names=c("Estimate","95\\% CI lb","95\\% CI ub","Estimate","95\\% CI lb","95\\% CI ub","$I^2$"))%>%
+  mutate_at(vars(min:max), round,2)
+
+kable(table_report_sens,"latex", booktabs=T,align = c("r",rep("r",3)),col.names = c("Parameter", "Min","Mean","Max"),caption = "Summary report of the correlations sensitivity analysis.", escape = FALSE) %>%
+  row_spec(0,bold = T, align = "c") %>%
+  kableExtra::group_rows(1,3,group_label = "$\\\\bf{\\\\sigma}$",escape = FALSE)%>%
+  kableExtra::group_rows(4,6,group_label = "$\\\\bf{d_{ppc2}}$",bold=T,escape = FALSE)%>%
+  kableExtra::group_rows(7,7,group_label = "Heterogeneity",escape = FALSE)%>%
+  kable_styling(position = "center", latex_options = "HOLD_position")
+  #footnote(general = "",footnote_as_chunk = T,escape=F)
+@
+
+Overall, results of the meta-analysis are only slightly influenced by the choice of the \texttt{r\_pre\_post} and \texttt{r\_outcomes} values. The standard deviation of the random effects of studies ($\sigma$) range from \Sexpr{table_report_sens[1,2]} to \Sexpr{table_report_sens[1,4]} with a mean value of \Sexpr{table_report_sens[1,3]}. The global effect of the treatments ($d_{ppc2}$) ranges from \Sexpr{table_report_sens[4,2]} to \Sexpr{table_report_sens[4,4]} with a mean value of \Sexpr{table_report_sens[4,3]}.
+
+Grater values of \texttt{r\_pre\_post} (and therefore smaller values of effect sampling variance \texttt{vi\_dppc2}, see Section~\ref{sec:effect_variance}) lead to greater values of $\sigma$, $d_{ppc2}$, and $I^2$. On the contrary, greater values of \texttt{r\_outcomes} (and therefore greater values of variance in the estimations as the indipendent information in data is lower) lead to smaller values of $\sigma$, $d_{ppc2}$, and $I^2$.
+
+
+<<Plot_sens_summary, fig.pos="!ht", fig.align="center", fig.height=8.6, fig.width=6.5, fig.cap="Results of the sensitivity analysis regarding \\texttt{r\\_pre\\_post} and \\texttt{r\\_outcomes}.", fig.scap="Results of the correlations sensitivity analysis.">>=
+sens_summary_plot(sens_summary)
+@
+
+%------------------------
+\subsubsection{\textit{Leave-One-Out} analysis}
+
+To assess the possible presence of influencial studies, we re-run the multilevel meta-analysis removing one study at time, thus we fit 19 different models. The complete results of each different model are saved in the R-object \texttt{sens\_loo\_summary} that can be loaded using the \texttt{drake} function \texttt{loadd(sens\_loo\_summary)}. The summary results are reported in Table~\ref{tab:Table_loo_summary} and presented in Figure~\ref{fig:Plot_loo_summary}.
+
+<<Table_loo_summary>>=
+table_report_loo = table_loo_summary%>%
+  filter(names!="sigma2",names!="SE",names!="QE")%>%
+  mutate(names=factor(names, levels=c("sigma","sigma_lb","sigma_ub","beta","beta_lb","beta_ub","I_squared")))%>%
+  arrange(names)%>%
+  mutate(names=c("Estimate","95\\% CI lb","95\\% CI ub","Estimate","95\\% CI lb","95\\% CI ub","$I^2$"))%>%
+  mutate_at(vars(min:max), round,2)
+
+kable(table_report_loo,"latex", booktabs=T,align = c("r",rep("r",3)),col.names = c("Parameter", "Min","Mean","Max"),caption = "Summary report of the LOO sensitivity analysis.", escape = FALSE) %>%
+  row_spec(0,bold = T, align = "c") %>%
+  kableExtra::group_rows(1,3,group_label = "$\\\\bf{\\\\sigma}$",escape = FALSE)%>%
+  kableExtra::group_rows(4,6,group_label = "$\\\\bf{d_{ppc2}}$",bold=T,escape = FALSE)%>%
+  kableExtra::group_rows(7,7,group_label = "Heterogeneity",escape = FALSE)%>%
+  kable_styling(position = "center", latex_options = "HOLD_position")
+  #footnote(general = "",footnote_as_chunk = T,escape=F)
+@
+
+Overall, results of the meta-analysis do not change considerably when one study is removed. The standard deviation of the random effects of studies ($\sigma$) range from \Sexpr{table_report_loo[1,2]} to \Sexpr{table_report_loo[1,4]} with a mean value of \Sexpr{table_report_loo[1,3]}. The global effect of the treatments ($d_{ppc2}$) ranges from \Sexpr{table_report_loo[4,2]} to \Sexpr{table_report_loo[4,4]} with a mean value of \Sexpr{table_report_loo[4,3]}.
+
+<<Plot_loo_summary, fig.pos="!ht", fig.align="center", fig.height=4.7, fig.width=6.7, fig.cap="Results of the \\textit{leave-one-out} sensitivity analysis.", fig.scap="Results of the \\textit{leave-one-out} sensitivity analysis.">>=
+readd(plot_sens_loo)
+@
+
+Moreover, to evaluate the presence of influencial studies we compute Cook's distance for each study \parencite{cookDetectionInfluentialObservation1977}. Cook's distances are presented in Figure~\ref{fig:Plot_cook}.
+
+<<Plot_cook, fig.pos="!ht", fig.align="center", fig.height=3.5, fig.width=6.5, fig.cap="Cook's distance of each study.", fig.scap="Cook's distance of each study.">>=
+readd(plot_cook)
+@
+
+
+\newpage
 %----------------------------------------------------------------------------------%
 %--------------------------    Session Information   ------------------------------%
 %----------------------------------------------------------------------------------%
