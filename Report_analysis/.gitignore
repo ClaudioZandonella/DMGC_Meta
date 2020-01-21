@@ -1,10 +1,11 @@
 
 # LaTeX auxiliary files
-
 Report_analysis.tex
+Report_analysis-tikzDictionary
 
 # Cache folder
 cache/*
 
 # Figure folder
 figure/*
+
