@@ -663,7 +663,7 @@ In the outcome we add the $I^2$ value computed following the functions presented
 <<rma_multilevel, echo=TRUE, eval=FALSE, tidy.opts=list(width.cutoff = 73)>>=
 @
 
-Default settings consider \texttt{r\_pre\_post = "r\_mediumh"}, which means a correlation of 0.6, and \texttt{r\_outcomes = 0.5}. These are reasonable values researchers would expect and the influence of different values on the results will be considered later. Below we report the output of the model \texttt{fit\_rma\_mv} based on default settings.
+Default settings consider \texttt{r\_pre\_post = "r\_mediumh"}, which means a correlation of 0.6, and \texttt{r\_outcomes = 0.5}. These are reasonable values researchers would expect. The influence of different values on the results is considered later. Below we report the output of the model \texttt{fit\_rma\_mv} based on default settings.
 
 <<fit_rma_mv_summary,echo=TRUE >>=
 summary(fit_rma_mv)
@@ -795,14 +795,14 @@ readd(plot_cook)
 
 To evaluate the presence of publication bias in the studies selected in the meta-analysis, the Funnel plot in presented in Figure~\ref{fig:Plot_funnel_mv}. We can observe that the distribution of effects is not symmetric with respect to the estimated overall treatments effect ($d_{ppc2}$). Studies with larger sample size tend to report smaller effects, whereas studies with smaller sample size show greater effects.
 
-However, this is not the optimal way to represent and evaluate the presence of publication bias, as studies with multiple effects are overrepresented in the plot respect to studies with only one effect. To overcome this issue we conduct two Egger’s regression tests.
+However, this is not the optimal way to represent and evaluate the presence of publication bias, as studies with multiple effects are overrepresented in the plot respect to studies with only one effect.
 
 <<Plot_funnel_mv, fig.pos="!ht", fig.align="center", fig.height=4.5, fig.width=5.5, fig.cap="Funnel plot of the multilevel meta-analysis ($n_{studies}=19$; $n_{effects}=42$).", fig.scap="Funnel plot of the multilevel meta-analysis.">>=
 par(mar = c(4, 4, 0, 4))
 funnel(fit_rma_mv)
 @
 
-The main idea is to evaluate if within studies the sample size (\texttt{N}) or the sampling variance (\texttt{vi\_dppc2}) are associated to the estimated effect size (\texttt{yi\_dppc2}). In absence of publication bias, studies results should be symmetrically distributed with respect to the estimated overall effect. Thus, studies results are expected to not be associated to sample size, sampling variance, or other indexes of the precision.
+To overcome this issue we conduct two Egger’s regression tests. The main idea is to evaluate if within studies the sample size (\texttt{N}) or the sampling variance (\texttt{vi\_dppc2}) are associated to the estimated effect size (\texttt{yi\_dppc2}). In absence of publication bias, studies results should be symmetrically distributed with respect to the estimated overall effect. Thus, studies results are expected to not be associated to sample size, sampling variance, or other indexes of the precision.
 
 In the first Egger’s regression test, we add the sample size as moderator in the multilevel meta-analysis (\texttt{mod = $\sim$ N}). Results are presented below.
 
