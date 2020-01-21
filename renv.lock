@@ -625,6 +625,13 @@
       "Repository": "CRAN",
       "Hash": "fc567cbfe050895175f3c54e96de048c"
     },
+    "robumeta": {
+      "Package": "robumeta",
+      "Version": "2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "922083d37976803ff79d3c94c9b025b1"
+    },
     "rpart": {
       "Package": "rpart",
       "Version": "4.1-15",
@@ -788,10 +795,10 @@
     },
     "webshot": {
       "Package": "webshot",
-      "Version": "0.5.1",
+      "Version": "0.5.2",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "e827a595bebabdfed25eec4eb1929ef0"
+      "Hash": "e99d80ad34457a4853674e89d5e806de"
     },
     "whisker": {
       "Package": "whisker",
