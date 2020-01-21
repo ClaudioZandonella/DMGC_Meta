@@ -95,6 +95,15 @@ loadd(mod_rma_mv_intensity)
 loadd(mod_rma_mv_device)
 loadd(mod_rma_mv_mot)
 
+loadd(test_mod_rma_mv_pub)
+loadd(test_mod_rma_mv_grade)
+loadd(test_mod_rma_mv_weeks)
+loadd(test_mod_rma_mv_intensity)
+loadd(test_mod_rma_mv_device)
+loadd(test_mod_rma_mv_mot)
+
+loadd(table_moderator_analysis)
+
 #-------
 
 data%>%

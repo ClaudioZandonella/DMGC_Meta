@@ -176,7 +176,12 @@ plan <- drake_plan(
     anova(mod_rma_mv),
     transform = map(mod_rma_mv)),
   
+  # Table with summary results
   
+  table_moderator_analysis = summary_moderator_analysis(
+    mod_rma_mv_pub,mod_rma_mv_grade,mod_rma_mv_weeks,
+    mod_rma_mv_intensity,mod_rma_mv_device,mod_rma_mv_mot
+  )
   
   #----    Report Analysis    ----
   #report_analysis = knitr_in("Report_analysis/Report_analysis.Rnw")

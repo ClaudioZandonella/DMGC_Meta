@@ -25,6 +25,7 @@ clean_data <- function(data){
     # Redefine factor labels for grade and device
     mutate(grade=recode_factor(grade,"1"="Primary","2"="Secondary"),
            device=recode_factor(device,"app"="App","con"="Console","pc"="PC"),
+           mot=recode_factor(mot, "1"="expectancy","2"="value"),
            # Obtain authors (year) label
            author_y=paste0(author," (",year,")"),
            # Compute intensity of the intervention
@@ -640,6 +641,22 @@ sens_cook_plot <- function(sens_cook_summary){
 
 # For moderator analysis the rma_multilevel() function was used setting moderator = "" option
 
+#----    table_moderator_analysis    ----
+
+summary_moderator_analysis <- function(mod_rma_mv_pub,mod_rma_mv_grade,
+                                     mod_rma_mv_weeks,mod_rma_mv_intensity,
+                                     mod_rma_mv_device,mod_rma_mv_mot){
+  
+  cbind(Moderator=c("pub","grade","weeks","intensity","device","mot"),
+        rbind(
+          get_info_moderator_analysis(mod_rma_mv_pub),
+          get_info_moderator_analysis(mod_rma_mv_grade),
+          get_info_moderator_analysis(mod_rma_mv_weeks),
+          get_info_moderator_analysis(mod_rma_mv_intensity),
+          get_info_moderator_analysis(mod_rma_mv_device),
+          get_info_moderator_analysis(mod_rma_mv_mot)))
+
+}
 
 ################################
 ####    Publication Bias    ####

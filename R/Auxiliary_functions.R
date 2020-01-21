@@ -55,4 +55,15 @@ compute_CI <- function(estimate, SE, data){
   return(CI)
 }
 
+#----    get_info_moderator_analysis    ----
+
+get_info_moderator_analysis <- function(mod_rma_mv){
+  
+  data.frame(n_studies = mod_rma_mv$s.nlevels,  # number of studies
+             n_effects = mod_rma_mv$k,          # number effects
+             Q_value = mod_rma_mv$QM,           # Q value
+             Q_df= mod_rma_mv$m,                # df Q-value
+             Q_pvalue = mod_rma_mv$QMp)         # p-value
+}
+
 #----    
