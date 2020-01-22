@@ -583,7 +583,7 @@ table_n_effects_studies%>%
   footnote(general = "$n_{studies}=19$; $n_{effects}=42$",footnote_as_chunk = T,escape=F)
 @
 
-Studies with multiple effect size differ according to the type of dependency between effects. In \Sexpr{table_freq_dependence%>%filter(dependence=="multiple_outcomes")%>%select(n)} studies outcomes where measured on the same participants. Only \Sexpr{table_freq_dependence%>%filter(dependence=="multiple_groups")%>%select(n)} study included multiple independent treatment groups compared to a single control group and another study included multiple independent treatment groups and independent control groups (see Table~\ref{rab:Table_freq_dependence}). 
+Studies with multiple effect size differ according to the type of dependency between effects. In \Sexpr{table_freq_dependence%>%filter(dependence=="multiple_outcomes")%>%select(n)} studies outcomes where measured on the same participants. Only \Sexpr{table_freq_dependence%>%filter(dependence=="multiple_groups")%>%select(n)} study included multiple independent treatment groups compared to a single control group and another study included multiple independent treatment groups and independent control groups (see Table~\ref{tab:Table_freq_dependence}). 
 
 <<Table_freq_dependence>>=
 table_freq_dependence%>%
