@@ -365,7 +365,7 @@ Finally, the role of possible moderators is examined using mixed-effects meta-re
 
 To guarantee the reproducibility of the results, the whole analysis is structured within an \textit{R-project} named \texttt{DMGC\_Meta.Rproj} that is possible to download from this repository \todo{add repository link}.
 
-The R-package \texttt{drake} \parencite{landauDrakePackagePipeline2018} is used to manage the analysis workflow and to enhance the readability and transparency of the analysis. To know more about \texttt{drake} consider the official Git-hub page (\url{https://github.com/ropensci/drake}) or the user manual(\url{https://books.ropensci.org/drake/}). Summarizing, using \texttt{drake} the code of the analysis is organized into different scripts. The user defines the plan of the analysis where each step in the analysis is defined trough functions. Functions can be can be appropriately defined to obtain desired targets (i.e., R-output with results of interests) and they are declared in another script. Subsequently, \texttt{drake} manage the whole analysis recognizing the dependency structure of the different targets. When any change is make to the code \texttt{drake} evaluate the analysis and update the results. Using function to define each step of the analysis allows to avoid "\textit{coping and paste}" in the code, it makes debugging easier, and it facilitates the reading of the code.
+The R-package \texttt{drake} \parencite{landauDrakePackagePipeline2018} is used to manage the analysis workflow and to enhance the readability and transparency of the analysis. To know more about \texttt{drake} consider the official Git-hub page (\url{https://github.com/ropensci/drake}) or the user manual(\url{https://books.ropensci.org/drake/}). Summarizing, using \texttt{drake} the code of the analysis is organized into different scripts. The user defines the plan of the analysis where each step in the analysis is defined trough functions. Functions can be appropriately defined to obtain desired targets (i.e., R-output with results of interests) and they are declared in another script. Subsequently, \texttt{drake} manages the whole analysis recognizing the dependency structure of the different targets. When any change is made to the code \texttt{drake} evaluates the analysis and updates the results. Using functions to define each step of the analysis allows to avoid "\textit{coping and paste}" in the code, it makes debugging easier, and it facilitates the reading of the code.
 
 Moreover, the R-package \texttt{renv} \parencite{usheyRenvProjectEnvironments2019} is used to manage the dependencies of the R-packages used in the analysis. The \texttt{renv} package allows to create an isolated, portable, and reproducible environment where the analyses are run. To know more about \texttt{renv} consider the official documentation (\url{https://rstudio.github.io/renv/articles/renv.html}).
 
@@ -521,8 +521,11 @@ The majority of the studies were published in a peer reviewed journal, but \Sexp
 
 \codestreach
 <<Table_freq_pub>>=
-cbind(table_freq_pub, type=c("Peer-reviewed journal","\\makecell[r]{Conference papers or \\\\dissertations}"))%>%
-  select("type", "n")%>%
+
+table_freq_pub%>%
+  arrange(rev(n))%>%
+  mutate(type=c("Peer-reviewed journal","\\makecell[r]{Conference papers or \\\\dissertations}"))%>%
+  select("type", "n") %>%
   kable("latex", booktabs=T,align = c("r","c"),col.names = c("Publication","Frequency"),caption = "Type of publication.",escape=F) %>%
     row_spec(0,bold = T, align = "c") %>%
   kable_styling(position = "center", latex_options = "HOLD_position")%>%
@@ -646,7 +649,7 @@ To compute the variance-covariance matrix in all studies, we used the \texttt{im
 
 \textcite{ke2006computer} is the only study where multiple independent treatment groups were compared to a common control group. In this case, covariance has to be computed considering this type of dependency between effects. \textcite{gleserStochasticallyDependentEffect2009} provided the formula to correctly compute the variance and covariance values for Cohen's d effect size when multiple experimental groups are compared to a common control group\footnote{The implemented R-functions are documented on the \texttt{metafor} website (\url{http://www.metafor-project.org/doku.php/analyses:gleser2009})}. However, to our knowledge, no formula is available in this case for the $d\_{ppc2}$ proposed by \textcite{morrisEstimatingEffectSizes2008}. Thus, we treat this study in the same way as studies with multiple measures on the same subjects. We allow correlation to vary in order to evaluate its influence on the results.
 
-Finally, \textcite{keAlternativeGoalStructures2008} is the only study where multiple independent treatment groups were compared to multiple independent control groups. In this case the correlation between outcomes is set to zero.
+Finally, \textcite{keAlternativeGoalStructures2008a} is the only study where multiple independent treatment groups were compared to multiple independent control groups. In this case the correlation between outcomes is set to zero.
 
 We specify a function that given a correlation value computes and adjust the variance-covariance matrix for all studies according to dependency between effects.
 

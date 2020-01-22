@@ -9,7 +9,7 @@ This R-project contains all the material and the scripts used to conduct the met
 
 To guarantee the reproducibility of the results, the whole analysis is structured within an `R-project` named `DMGC_Meta.Rproj` that is possible to download from this repository <span style="color:red">add repository link</span>.
 
-The R-package`drake` is used to manage the analysis workflow and to enhance the readability and transparency of the analysis. To know more about `drake` consider the [official Git-hub page](https://github.com/ropensci/drake) or the [user manual](https://books.ropensci.org/drake/). Summarizing, using `drake` the code of the analysis is organized into different scripts. The user defines the plan of the analysis where each step in the analysis is defined trough functions. Functions can be can be appropriately defined to obtain desired targets (i.e., R-output with results of interests) and they are declared in another script. Subsequently, `drake` manage the whole analysis recognizing the dependency structure of the different targets. When any change is make to the code `drake` evaluate the analysis and update the results. Using function to define each step of the analysis allows to avoid "*coping and paste*" in the code, it makes debugging easier, and it facilitates the reading of the code.
+The R-package`drake` is used to manage the analysis workflow and to enhance the readability and transparency of the analysis. To know more about `drake` consider the [official Git-hub page](https://github.com/ropensci/drake) or the [user manual](https://books.ropensci.org/drake/). Summarizing, using `drake` the code of the analysis is organized into different scripts. The user defines the plan of the analysis where each step in the analysis is defined trough functions. Functions can be appropriately defined to obtain desired targets (i.e., R-output with results of interests) and they are declared in another script. Subsequently, `drake` manages the whole analysis recognizing the dependency structure of the different targets. When any change is made to the code `drake` evaluates the analysis and updates the results. Using functions to define each step of the analysis allows to avoid "*coping and paste*" in the code, it makes debugging easier, and it facilitates the reading of the code.
 
 Moreover, the R-package `renv` is used to manage the dependencies of the R-packages used in the analysis. The `renv` package allows to create an isolated, portable, and reproducible environment where the analyses are run. To know more about `renv` consider the [official documentation](https://rstudio.github.io/renv/articles/renv.html).
 
@@ -29,7 +29,7 @@ In the folder `R/`, the R-scripts used in the analysis are stored. Using the `dr
 - [Analysis.R](R/Analysis.R) is the script used to run the whole analysis.
 
 
-In the folder `Report_analysis/`, it is possible to find the script used to compile the present report.
+In the folder `Report_analysis/`, it is possible to find the script used to compile the *Analysis Report*.
 
 
 ### Run the Analysis
