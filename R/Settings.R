@@ -5,19 +5,28 @@
 
 #----     R packages   ----
 
-packages_list <- c("conflicted",
-                   "tidyverse",
-                   "metafor",
-                   "clubSandwich",
-                   "drake",
-                   "gridExtra",
-                   "MAd",
-                   "visNetwork")
+library("conflicted")
+library("tidyverse")
+library("metafor")
+library("clubSandwich")
+library("drake")
+library("gridExtra")
+library("MAd")
+library("visNetwork")
 
-
-# load packages
-lapply(packages_list,require, character.only = TRUE)
-
+# packages_list <- c("conflicted",
+#                    "tidyverse",
+#                    "metafor",
+#                    "clubSandwich",
+#                    "drake",
+#                    "gridExtra",
+#                    "MAd",
+#                    "visNetwork")
+# 
+# 
+# # load packages
+# lapply(packages_list,require, character.only = TRUE)
+# 
 
 #----    Procedure to remove packages   -----
 # ip <- as.data.frame(installed.packages())
@@ -30,7 +39,7 @@ lapply(packages_list,require, character.only = TRUE)
 
 #----    renv comands    ----
 
-# renv::settings$snapshot.type("simple")
+# renv::settings$snapshot.type("packrat")
 # renv::purge()
 # renv::hydrate("formatR")
 # sapply(packages_list, renv::hydrate)
