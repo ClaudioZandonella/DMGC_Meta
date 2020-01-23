@@ -113,6 +113,7 @@ loadd(data)
 loadd(table_n_effects_studies)
 loadd(table_freq_pub)
 loadd(table_freq_grade)
+loadd(table_freq_math_area)
 loadd(table_freq_device)
 loadd(table_freq_weeks)
 loadd(table_freq_dependence)
@@ -156,6 +157,7 @@ loadd(table_moderator_analysis)
 # Labels
 
 label_grade = c("Primary school","Secondary school")
+label_math_area = c("Algebra","Geometry","Number","Multiple areas")
 label_dependece = c("Independent experimental and control groups", "Independent experimental groups same control", "Multiple outcomes on same participants","Single effect")
 label_mot = c("Expectancy", "Value", "Not differentiated")
 
@@ -220,7 +222,7 @@ in K-12}\\
 	
 	\vspace{2cm}
 
-\newpage
+\clearpage
 
 \clearpage
 \pagenumbering{Roman} 
@@ -228,7 +230,7 @@ in K-12}\\
 
 \tableofcontents
 
-\newpage
+\clearpage
 
 \listoffigures
 \listoftables
@@ -258,7 +260,7 @@ The analysis report is divided into different sections:
     \item{\textbf{Section~\ref{sec:Meta-Analysis_Results}:} the results of the meta-analysis are described.}
 \end{itemize}
 
-\newpage
+\clearpage
 
 %----------------------------------------------------------------------------------%
 %--------------------------    Statistical Approach      --------------------------%
@@ -401,7 +403,7 @@ In order to run the analysis follow these steps:
   \item{Now you can access the targets with the results using the functions \texttt{drake::loadd(<name\_target>)} and \texttt{drake::readd(<name\_target>)}.}
 \end{enumerate}
 
-\newpage
+\clearpage
 
 %----------------------------------------------------------------------------------%
 %------------------       Data Presentation and Preparation     -------------------%
@@ -425,6 +427,7 @@ In the folder \texttt{Data/}, you can find the file \texttt{Dataset.csv} with al
   \item{\texttt{weeks}} -  Numerical variable that indicates the duration of the treatment in weeks.
   \item{\texttt{sessions}} - Numerical variable that indicates the total number of sessions of the treatment.
   \item{\texttt{minutes}} - Numerical variable that indicates average time in minutes of each session of the treatment.
+  \item{\texttt{math\_area}} - Character string that indicates the math area target of the treatment. Algebra (\texttt{algebra}), geometry (\texttt{geometry}), number (\texttt{number}), or multiple areas (\texttt{multiple\_areas}).
   \item{\texttt{device}} - Character string that indicates the device used during the treatment. Personal Computer (\texttt{pc}), console (\texttt{con}), or application on other device (\texttt{app}).
   \item{\texttt{n\_effect}} - Numerical variable that identifies within each study the different effects. In each study the first effect is identified with \texttt{1}, then the value increases if more effects are reported within the same study. 
   \item{\texttt{id\_effect}} - Numerical variable that identifies the unique effect. Values range from \texttt{1} to \texttt{43}.
@@ -496,7 +499,7 @@ We do not include this effect in the meta-analysis and we remove it from the dat
 @
 
 
-\newpage
+\clearpage
 
 %----------------------------------------------------------------------------------%
 %--------------------------    Descriptive Statistics    --------------------------%
@@ -545,6 +548,17 @@ The studies included in the meta-analysis differ according to the school grade o
 table_freq_grade%>%
   mutate(grade=recode(grade, Primary = "Primary school", Secondary = "Secondary school"))%>%
   kable("latex", booktabs=T,align = c("r","c"),col.names = c("School grade","Frequency"),caption = "Participants school grade.",escape=F) %>%
+    row_spec(0,bold = T, align = "c") %>%
+  kable_styling(position = "center", latex_options = "HOLD_position")%>%
+  footnote(general = "$n_{studies}=19$",footnote_as_chunk = T,escape=F)
+@
+
+Regarding the math area target of the treatment, \Sexpr{table_freq_math_area%>%filter(math_area=="number")%>%select(n)} studies focused on numbers, \Sexpr{table_freq_math_area%>%filter(math_area=="algebra")%>%select(n)} studies on algebra, only one study on geometry and \Sexpr{table_freq_math_area%>%filter(math_area=="mulitple_areas")%>%select(n)} focused on multiple areas (see Table~\ref{tab:Table_freq_math_area}).
+
+<<Table_freq_math_area>>=
+table_freq_math_area%>%
+  mutate(math_area = label_math_area)%>%
+  kable("latex", booktabs=T,align = c("r","c"),col.names = c("Math area","Frequency"),caption = "Math area target of the treatment.",escape=F) %>%
     row_spec(0,bold = T, align = "c") %>%
   kable_styling(position = "center", latex_options = "HOLD_position")%>%
   footnote(general = "$n_{studies}=19$",footnote_as_chunk = T,escape=F)
@@ -599,7 +613,7 @@ table_freq_dependence%>%
 
 In Figure~\ref{fig:Plot_dist_effects} the estimated effect sizes of each study are presented together with confidence intervals. The studies are ordered according to the total number of participants included and multiple outcomes from the same study are grouped together. We can observe the high variability between effects and how with the increasing of the sample size effects tend to be smaller.
 
-<<Plot_dist_effects, fig.pos="H", fig.align="center", fig.height=4.8, fig.width=6, fig.cap="Estimated effect size according to number of participants ($n_{studies}=19$; $n_{effects}=42$).", fig.scap="Estimated effect size according to number of participants">>=
+<<Plot_dist_effects, fig.pos="t!", fig.align="center", fig.height=5, fig.width=6, fig.cap="Estimated effect size according to number of participants ($n_{studies}=19$; $n_{effects}=42$).", fig.scap="Estimated effect size according to number of participants">>=
 readd(plot_effects_participants)
 @
 
@@ -614,7 +628,7 @@ table_freq_mot%>%
   footnote(general = "$n_{effects} = 42$",footnote_as_chunk = T,escape=F)
 @
 
-\newpage
+\clearpage
 
 %----------------------------------------------------------------------------------%
 %--------------------------    Meta-Analysis Results     --------------------------%
@@ -850,7 +864,7 @@ Overall, the results indicate the presence of publication bias.
 \subsection{Moderators analysis}
 
 
-In this last part of the analysis, we evaluate he role of possible moderators such as type of publication (\texttt{mod = $\sim$ pub}), school grade of the participants (\texttt{mod = $\sim$ grade}), duration of the treatment in weeks (\texttt{mod = $\sim$ weeks}), intensity of the treatment (\texttt{mod = $\sim$ intensity}; see Section~\ref{sec:munging}), device used in the treatment (\texttt{mod = $\sim$ device}), and type of motivation measured (\texttt{mod = $\sim$ mot}).
+In this last part of the analysis, we evaluate he role of possible moderators such as type of publication (\texttt{mod = $\sim$ pub}), school grade of the participants (\texttt{mod = $\sim$ grade}), duration of the treatment in weeks (\texttt{mod = $\sim$ weeks}), intensity of the treatment (\texttt{mod = $\sim$ intensity}; see Section~\ref{sec:munging}), math area target of the treatment (\texttt{mod = $\sim$ math\_area}), device used in the treatment (\texttt{mod = $\sim$ device}), and type of motivation measured (\texttt{mod = $\sim$ mot}).
 
 All the moderators are variables at the studies level. Only \texttt{mot} is a variable at the outcomes level as within the same study measures can differ according to the type of motivation. Three-level meta-analysis allows to investigate also this aspect that would not be possible to evaluate otherwise.
 
@@ -859,10 +873,12 @@ For each moderator a separate model is fitted Thus, results have to be interpret
 <<Table_moderator_analysis>>=
 
 table_moderator_analysis%>%
-  cbind(Sign=c(" "," ","*"," "," ","**"))%>%
-  mutate(Moderator=paste0("\\texttt{",Moderator,"}"),
+  cbind(Sign=c(" "," ","*"," "," "," ","**"))%>%
+  mutate(Moderator=ifelse(Moderator=="math_area", "math\\_area",as.character(Moderator)),
+         Moderator=paste0("\\texttt{",Moderator,"}"),
          Q_value=round(Q_value,2),
          Q_pvalue=round(Q_pvalue,3))%>%
+  
   kable("latex", booktabs=T,align = c("r",rep("c",5),"l"),col.names = c("Moderator", "Studies","Effects","Q-value","df","p-value","Sign."),caption = "Results of the moderators analysis", escape = FALSE,linesep = "") %>%
   row_spec(0,bold = T, align = "c")%>%
   kable_styling(position = "center", latex_options = "HOLD_position")
@@ -891,7 +907,7 @@ Overall, results indicate that there is a small effect of treatments. Moreover, 
 
 However, this results have to be considered with caution given the great heterogeneity between studies and the presence of  publication bias. 
 
-\newpage
+\clearpage
 %----------------------------------------------------------------------------------%
 %--------------------------    Session Information   ------------------------------%
 %----------------------------------------------------------------------------------%
@@ -902,7 +918,7 @@ However, this results have to be considered with caution given the great heterog
   sessionInfo(package = NULL)
 @
   
-\newpage
+\clearpage
 
 \section*{Appendix A}
 \addcontentsline{toc}{section}{Appendix A: Studies included in the meta-analysis}
@@ -931,7 +947,7 @@ However, this results have to be considered with caution given the great heterog
 
 \printbibliography[heading=subbibliography, title= Studies included in the meta-analysis]
 \end{refsection}
-\newpage
+\clearpage
 
 \phantomsection 
 \addcontentsline{toc}{section}{Bibliography}

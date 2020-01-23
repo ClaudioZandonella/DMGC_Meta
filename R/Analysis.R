@@ -44,6 +44,7 @@ readd(table_n_effects_studies)
 readd(plot_publication_year)
 readd(table_freq_pub)
 readd(table_freq_grade)
+readd(table_freq_math_area)
 readd(table_freq_device)
 readd(table_freq_weeks)
 readd(table_freq_dependence)
@@ -92,6 +93,7 @@ loadd(mod_rma_mv_pub)
 loadd(mod_rma_mv_grade)
 loadd(mod_rma_mv_weeks)
 loadd(mod_rma_mv_intensity)
+loadd(mod_rma_mv_math_area)
 loadd(mod_rma_mv_device)
 loadd(mod_rma_mv_mot)
 
@@ -99,6 +101,7 @@ loadd(test_mod_rma_mv_pub)
 loadd(test_mod_rma_mv_grade)
 loadd(test_mod_rma_mv_weeks)
 loadd(test_mod_rma_mv_intensity)
+loadd(test_mod_rma_mv_math_area)
 loadd(test_mod_rma_mv_device)
 loadd(test_mod_rma_mv_mot)
 
@@ -106,23 +109,22 @@ loadd(table_moderator_analysis)
 
 #-------
 
+
+#############################
+###    Extra analysis    ####
+#############################
+
+
+#----    multilevel with 2 random effects    ----
+
 data%>%
   filter(r_size=="r_mediumh")%>%
   rma.mv(yi_dppc2,vi_dppc2, random =  list(~ 1|study,
                                            ~ 1|id_effect), 
       method = "REML", data = ., slab=author_y)
 
-plan_1 <- drake_plan(
-  raw_data = read_excel(file_in("raw_data.xlsx")),
-  data = raw_data,
-  hist = create_plot(data),
-  fit = lm(Sepal.Width ~ Petal.Width + Species, data)
-)
-file <- tempfile()
-# Turn the plan into an R script a the given file path.
-plan_to_code(plan_1, file)
-# Here is what the script looks like.
-cat(readLines(file), sep = "\n")
-# Convert back to a drake plan.
-code_to_plan(file)
 
+#----    moderator analysis math_area dropping geometry    ----
+
+rma_multilevel(data[data$math_area!="geometry",],r_pre_post="r_mediumh",r_outocomes=.5,
+               moderator = ~math_area)

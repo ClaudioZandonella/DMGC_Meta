@@ -9,9 +9,9 @@
 
 #----    load_dataset function   ----
 
-load_dataset <- function(){
+load_dataset <- function(file_path){
 #---- load_dataset ----
-  data_raw <- read.csv("Data/Dataset.csv",sep=";", header = T, stringsAsFactors = F)
+  data_raw <- read.csv(file_path,sep=";", header = T, stringsAsFactors = F)
 #----
   return(data_raw)
 }
@@ -21,9 +21,12 @@ load_dataset <- function(){
 clean_data <- function(data){
   data%>% 
     # Define which variable are factor
-    mutate_at(vars("study","id","pub","dependence","grade","device","mot"), factor)%>% 
+    mutate_at(vars("study","id","pub","dependence","grade",
+                   "math_area","device","mot"), factor)%>% 
     # Redefine factor labels for grade and device
     mutate(grade=recode_factor(grade,"1"="Primary","2"="Secondary"),
+           math_area=recode_factor(math_area,"multiple areas"="multiple_areas"),
+           math_area=fct_relevel(math_area,"algebra","geometry","number","multiple_areas"),
            device=recode_factor(device,"app"="App","con"="Console","pc"="PC"),
            mot=recode_factor(mot, "1"="expectancy","2"="value"),
            # Obtain authors (year) label
@@ -645,14 +648,16 @@ sens_cook_plot <- function(sens_cook_summary){
 
 summary_moderator_analysis <- function(mod_rma_mv_pub,mod_rma_mv_grade,
                                      mod_rma_mv_weeks,mod_rma_mv_intensity,
-                                     mod_rma_mv_device,mod_rma_mv_mot){
+                                     mod_rma_mv_math_area,mod_rma_mv_device,
+                                     mod_rma_mv_mot){
   
-  cbind(Moderator=c("pub","grade","weeks","intensity","device","mot"),
+  cbind(Moderator=c("pub","grade","weeks","intensity","math_area","device","mot"),
         rbind(
           get_info_moderator_analysis(mod_rma_mv_pub),
           get_info_moderator_analysis(mod_rma_mv_grade),
           get_info_moderator_analysis(mod_rma_mv_weeks),
           get_info_moderator_analysis(mod_rma_mv_intensity),
+          get_info_moderator_analysis(mod_rma_mv_math_area),
           get_info_moderator_analysis(mod_rma_mv_device),
           get_info_moderator_analysis(mod_rma_mv_mot)))
 

@@ -7,7 +7,7 @@ plan <- drake_plan(
   #----    Data Preparation   -----
   
   # Load the dataset
-  data_raw = load_dataset(),
+  data_raw = load_dataset(file_path="Data/Dataset_01_23_2020.csv"),
   
   # Munge the dataset
   data_munged = munge_data(data_raw),
@@ -27,9 +27,9 @@ plan <- drake_plan(
   # Plot n studies according to publication year
   plot_publication_year = publication_year(data),
   
-  # Frequencies studies according to publication, school-grade, device, dependence
+  # Frequencies studies according to publication, school-grade, math_area, device, dependence
   table_freq = target(freq_table(data, var_name = ddd),
-                      transform = map(ddd=c(pub,grade,device,dependence))),
+                      transform = map(ddd=c(pub,grade,math_area, device,dependence))),
   
   # Frequencies studies according  to weeks
   table_freq_weeks = freq_table_weeks(data),
@@ -168,7 +168,7 @@ plan <- drake_plan(
                        moderator = moderator_value),
     # Define an analysis target for each moderator
     transform = map(moderator_value=c("pub","grade","weeks","intensity",
-                                      "device", "mot")
+                                      "math_area","device", "mot")
     )),
   
   # Test of moderator
@@ -180,7 +180,8 @@ plan <- drake_plan(
   
   table_moderator_analysis = summary_moderator_analysis(
     mod_rma_mv_pub,mod_rma_mv_grade,mod_rma_mv_weeks,
-    mod_rma_mv_intensity,mod_rma_mv_device,mod_rma_mv_mot
+    mod_rma_mv_intensity,mod_rma_mv_math_area,
+    mod_rma_mv_device,mod_rma_mv_mot
   )
   
   #----    Report Analysis    ----
