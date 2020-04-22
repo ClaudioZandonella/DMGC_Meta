@@ -114,6 +114,7 @@ loadd(table_moderator_analysis)
 ###    Extra analysis    ####
 #############################
 
+loadd(data)
 
 #----    multilevel with 2 random effects    ----
 

@@ -346,7 +346,7 @@ On the contrary, RVA approach allows only to decide between a correlated effects
 %------------------------
 \subsection{Analysis plan}
 
-The analysis are conducted with R software \parencite[version \Sexpr{paste0(c(version$major,".",version$minor,";"))}][]{rcoreteamLanguageEnvironmentStatistical2018}. First, we load and prepare the dataset for the analysis, computing the effect size estimate and variance for each outcome. As presented in Formula~\ref{eq:dppc2_variance}, values of the correlation between pre-test and post-test scores are needed to the compute $d_{ppc2}$ variance. However, none of the studies reported this information. To overcome this issue, $d_{ppc2}$ variance is computed with different correlation values and their influence on the meta-analysis results will be subsequently evaluated.
+The analysis are conducted with R software \parencite[version \Sexpr{paste0(c(version$major,".",version$minor,";"), collapse="")}][]{rcoreteamLanguageEnvironmentStatistical2018}. First, we load and prepare the dataset for the analysis, computing the effect size estimate and variance for each outcome. As presented in Formula~\ref{eq:dppc2_variance}, values of the correlation between pre-test and post-test scores are needed to the compute $d_{ppc2}$ variance. However, none of the studies reported this information. To overcome this issue, $d_{ppc2}$ variance is computed with different correlation values and their influence on the meta-analysis results will be subsequently evaluated.
 
 Next, descriptive statistics are presented to evaluate the main characteristics of the data included in the analysis.
 
@@ -651,7 +651,6 @@ As we have seen in Table~\ref{tab:Table_freq_dependence} only \Sexpr{table_freq_
   cov(AB) = \rho_{AB}*\sigma_A\sigma_B.
 \end{equation}
 The same formula applies for each couple of outcomes when multiple outcomes were measured. The variance-covariance matrix ($\Sigma$) can be computed as the product between the diagonal matrix that includes the outcomes standard deviation ($diag(S)$) and the correlation matrix ($Corr$):
-\todo{Control notation}
 \begin{equation}
    \Sigma =  diag(S)*Corr*diag(S).
 \end{equation}
@@ -661,7 +660,7 @@ However, none of the studies reported the correlation between values. Thus, vari
 To compute the variance-covariance matrix in all studies, we used the \texttt{impute\_covariance\_matrix()} function included in the R-package \texttt{clubSandwich} \parencite{pustejovskyClubSandwichClusterrobustSandwich2019}. Given an assumed correlation value, the vector with all variances, and the grouping variable (in this case \texttt{study} as effects are grouped within studies), this function returns a list with the variance-covariance matrix for each study.
 \Sexpr{table_freq_dependence%>%filter(dependence=="multiple_outcomes")%>%select(n)} studies outcomes where measured on the same participants. In the case of studies with only one effect, the \texttt{impute\_covariance\_matrix()} function returns a 1x1 matrix with sampling variance value.
 
-\textcite{keAlternativeGoalStructures2008a} is the only study where multiple independent treatment groups were compared to a common control group. In this case, covariance has to be computed considering this type of dependency between effects. \textcite{gleserStochasticallyDependentEffect2009} provided the formula to correctly compute the variance and covariance values for Cohen's d effect size when multiple experimental groups are compared to a common control group\footnote{The implemented R-functions are documented on the \texttt{metafor} website (\url{http://www.metafor-project.org/doku.php/analyses:gleser2009})}. However, to our knowledge, no formula is available in this case for the $d\_{ppc2}$ proposed by \textcite{morrisEstimatingEffectSizes2008}. Thus, we treat this study in the same way as studies with multiple measures on the same subjects. We allow correlation to vary in order to evaluate its influence on the results.
+\textcite{keAlternativeGoalStructures2008} is the only study where multiple independent treatment groups were compared to a common control group. In this case, covariance has to be computed considering this type of dependency between effects. \textcite{gleserStochasticallyDependentEffect2009} provided the formula to correctly compute the variance and covariance values for Cohen's d effect size when multiple experimental groups are compared to a common control group\footnote{The implemented R-functions are documented on the \texttt{metafor} website (\url{http://www.metafor-project.org/doku.php/analyses:gleser2009})}. However, to our knowledge, no formula is available in this case for the $d\_{ppc2}$ proposed by \textcite{morrisEstimatingEffectSizes2008}. Thus, we treat this study in the same way as studies with multiple measures on the same subjects. We allow correlation to vary in order to evaluate its influence on the results.
 
 Finally, \textcite{ke2006computer} is the only study where multiple independent treatment groups were compared to multiple independent control groups. In this case the correlation between outcomes is set to zero.
 
