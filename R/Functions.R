@@ -430,14 +430,14 @@ forest_plot <- function(fit_rma_mv){
   forest(fit_rma_mv, slab =labels$autor_y, xlim=c(-3,3),ilab=labels[,-1],
          ilab.pos=2, ilab.xpos=c(-1,1.8,3,2.3), annotate = F)
   
-  text(-3,44, "Author(s) Year",  pos=4,font=2)
-  text(-1.1,44, "Effect",font=2)
-  text(3,44,"[95\\% CI]",font=2,pos=2)
+  text(-3,45, "Author(s) Year",  pos=4,font=2)
+  text(-1.1,45, "Effect",font=2)
+  text(3,45,"[95\\% CI]",font=2,pos=2)
   text(3,-1,paste0("[",round(fit_rma_mv$ci.lb,2),";",
                    round(fit_rma_mv$ci.ub,2),"]"), pos=2)
-  text(2.3,44,expression(d[ppc2]),font=2, pos=2)
+  text(2.3,45,expression(d[ppc2]),font=2, pos=2)
   text(2.3,-1,round(fit_rma_mv$b,2),pos=2)
-  text(1.6,44,"Sample Size",font=2)
+  text(1.6,45,"Sample Size",font=2)
   
   p <- recordPlot()
   
@@ -600,9 +600,9 @@ sens_loo_plot <- function(sens_loo_summary, fit_rma_mv, data, label_I_squared = 
     geom_text(aes(x=.50,y=author_y,label=lab_I_squared),size=3)+
     geom_text(aes(x=.54,y=author_y,label=lab_beta),size=3)+
     geom_text(aes(x=.60,y=author_y,label=lab_ci),size=3)+
-    geom_text(aes(x=.50,y=21,label=label_I_squared),size=4)+
-    geom_text(aes(x=.54,y=21,label=label_dppc2),size=4)+
-    geom_text(aes(x=.60,y=21,label=label_ci),size=4)+
+    geom_text(aes(x=.50,y=22,label=label_I_squared),size=4)+
+    geom_text(aes(x=.54,y=22,label=label_dppc2),size=4)+
+    geom_text(aes(x=.60,y=22,label=label_ci),size=4)+
     scale_x_continuous(breaks = seq(0,.45, by=.05))+
     labs(y="Obmitted study",
          x="Beta coefficient")+
@@ -618,7 +618,7 @@ sens_cook <- function(fit_rma_mv){
   sens_cook = as.data.frame(
     cooks.distance(fit_rma_mv, cluster = fit_rma_mv$data$study))%>%
     mutate(author_y=factor(unique(fit_rma_mv$data$author_y), levels=unique(fit_rma_mv$data$author_y)),
-           id=1:19)
+           id=1:20)
   names(sens_cook)[1]="cooks_distance"
   
   return(sens_cook)

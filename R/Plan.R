@@ -7,7 +7,7 @@ plan <- drake_plan(
   #----    Data Preparation   -----
   
   # Load the dataset
-  data_raw = load_dataset(file_path="Data/Dataset_01_23_2020.csv"),
+  data_raw = load_dataset(file_path="Data/Dataset_04_22_2020.csv"),
   
   # Munge the dataset
   data_munged = munge_data(data_raw),
@@ -107,7 +107,7 @@ plan <- drake_plan(
   fit_rma_loo = target(
     rma_multilevel(data, excluded_study= excluded_study_value),
     # Define an analysis target for each study removed (excluded_study_value)
-    transform = map(excluded_study_value=!!seq(1,19, by=1))
+    transform = map(excluded_study_value=!!seq(1,20, by=1))
     ),
   
   # Get results for each study removed

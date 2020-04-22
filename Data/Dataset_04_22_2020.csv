@@ -1,0 +1,45 @@
+study;id;author;year;pub;grade;weeks;sessions;minutes;math_area;device;n_effect;id_effect;dependence;N ;n_cg;n_eg;mot;m_t1_cg;sd_t1_cg;m_t2_cg;sd_t2_cg;m_t1_eg;sd_t1_eg;m_t2_eg;sd_t2_eg
+1;54;Bai et al.;2012;yes;2;18;;;algebra;pc;1;1;none;437;192;245;;75.58;11.97;72.42;10.96;71.19;12.35;71.8;13.48
+2;961;Ke;2006;no;1;4;8;45;multiple areas;pc;1;2;independent;115;58;57;;156.22;23.84;156.05;26.47;150.36;30.52;151.39;29.72
+2;961;Ke;2006;no;1;4;8;45;multiple areas;pc;2;3;independent;114;63;51;;149.37;30.12;145.7;28.88;142.11;33.06;145.82;30.17
+2;961;Ke;2006;no;1;4;8;45;multiple areas;pc;3;4;independent;129;60;69;;145.03;26.91;144.87;28.02;152.03;24.9;162.01;23.93
+3;432;Ke;2008;yes;1;4;8;40;multiple areas;pc;1;5;multiple_groups;76;36;40;;77.5;9.38;74.2;12;77.7;13.2;77.3;15.6
+3;432;Ke;2008;yes;1;4;8;40;multiple areas;pc;2;6;multiple_groups;77;36;41;;77.5;9.38;74.2;12;74.7;12.4;75;13.5
+3;432;Ke;2008;yes;1;4;8;40;multiple areas;pc;3;7;multiple_groups;79;36;43;;77.5;9.38;74.2;12;74.1;12.6;78.5;12.04
+4;436;Kebritchi et al.;2010;yes;2;18;18;30;algebra;pc;1;8;none;193;76;117;;67.99;13.11;68.53;11.38;70.58;13.48;68.2;13.17
+5;982;LaDonna;2018;no;1;7;7;45;multiple areas;pc;1;9;none;80;40;40;1;46.5;8.55;47.53;7.88;41.55;8.79;46.85;8.28
+6;983;Rodriguez-Aflecht et al.;2015;yes;1;10;;30;number;pc;1;10;multiple_outcomes;1168;526;642;2;3.11;0.98;3.18;0.88;3.14;0.94;3.05;0.96
+6;983;Rodriguez-Aflecht et al.;2015;yes;1;10;;30;number;pc;2;11;multiple_outcomes;1168;526;642;2;4.21;0.78;4.28;0.67;4.18;0.7;4.14;0.7
+6;983;Rodriguez-Aflecht et al.;2015;yes;1;10;;30;number;pc;3;12;multiple_outcomes;1168;526;642;2;3.46;0.87;3.45;0.82;3.53;0.8;3.4;0.84
+6;983;Rodriguez-Aflecht et al.;2015;yes;1;10;;30;number;pc;4;13;multiple_outcomes;1168;526;642;1;3.72;0.82;3.67;0.76;3.68;0.78;3.63;0.82
+7;964;Starkey;2013;no;2;9;9;30;algebra;pc;1;14;multiple_outcomes;168;84;84;2;22.15;2.695;22.12;2.881;22.07;2.723;23.21;2.807
+7;964;Starkey;2013;no;2;9;9;30;algebra;pc;2;15;multiple_outcomes;168;84;84;2;25.93;4.219;26.05;4.177;25.89;4.294;26.21;4.174
+7;964;Starkey;2013;no;2;9;9;30;algebra;pc;3;16;multiple_outcomes;168;84;84;1;28.18;4.867;28.23;4.821;27.94;4.624;28.11;4.83
+7;964;Starkey;2013;no;2;9;9;30;algebra;pc;4;17;multiple_outcomes;168;84;84;2;27.86;3.275;27.92;3.451;27.64;3.4;27.69;3.23
+7;964;Starkey;2013;no;2;9;9;30;algebra;pc;5;18;multiple_outcomes;168;84;84;1;37.23;8.014;37.05;8.093;37.58;8.244;37.64;7.972
+7;964;Starkey;2013;no;2;9;9;30;algebra;pc;6;19;multiple_outcomes;168;84;84;2;52.36;3.266;52.44;3.198;52.1;2.96;52.11;2.896
+7;964;Starkey;2013;no;2;9;9;30;algebra;pc;7;20;multiple_outcomes;168;84;84;2;27.11;9.53;26.52;9.47;27.04;9.46;27.27;9.23
+7;964;Starkey;2013;no;2;9;9;30;algebra;pc;8;21;multiple_outcomes;168;84;84;2;30.86;9.15;30.63;8.91;31.25;9.132;32.15;8.764
+8;584;Mavridis et al.;2017;yes;2;14;;;multiple areas;pc;1;22;multiple_outcomes;79;41;38;2;3.89;0.64;3.77;0.61;3.9;0.65;4.24;0.47
+8;584;Mavridis et al.;2017;yes;2;14;;;multiple areas;pc;2;23;multiple_outcomes;79;41;38;2;3.1;0.71;2.99;0.84;3.25;0.76;3.65;0.61
+8;584;Mavridis et al.;2017;yes;2;14;;;multiple areas;pc;3;24;multiple_outcomes;79;41;38;1;3.09;0.85;3.07;0.8;3.4;0.8;3.5;0.81
+8;584;Mavridis et al.;2017;yes;2;14;;;multiple areas;pc;4;25;multiple_outcomes;79;41;38;2;2.91;0.82;2.6;0.84;2.96;0.88;3.39;0.79
+9;610;Miller and Robertson;2011;yes;2;9;45;20;number;con;1;26;none;633;306;327;1;36.13;8.61;36.21;8.97;36.46;9.04;36.53;9.04
+10;452;Kim et al.;2017;yes;1;1;;35;number;pc;1;27;none;132;66;66;;55.24;11;65.42;8.8;55.03;12.17;66.79;8.99
+11;669;Pareto et al.;2011;no;1;9;9;40;number;pc;1;28;multiple_outcomes;143;75;68;2;2.67;4.9;;;3.97;4.25;;
+11;669;Pareto et al.;2011;no;1;9;9;40;number;pc;2;29;multiple_outcomes;143;75;68;1;6.79;4.19;;;5.5;4.39;;
+12;971;Chang et al.;2016;yes;1;2;8;20;number;app;1;30;multiple_outcomes;91;27;64;2;28.085;7.475;25.17;8.075;27.905;7.075;28.275;7.34
+12;971;Chang et al.;2016;yes;1;2;8;20;number;app;2;31;multiple_outcomes;90;26;64;2;27.945;6.05;26.24;6.72;30.945;6.405;31.735;6.99
+13;959;Hung et al.;2014;yes;1;1;1;240;geometry;app;1;32;multiple_outcomes;46;23;23;1;3.3;0.76;3.24;0.82;3.53;0.62;3.74;0.79
+13;959;Hung et al.;2014;yes;1;1;1;240;geometry;app;2;33;multiple_outcomes;46;23;23;2;3;0.02;3.23;0.72;3;0;3.78;0.72
+14;476;Ku et al.;2014;yes;1;5;10;20;number;pc;1;34;none;59;28;31;1;3.37;0.62;3.22;0.82;3.36;0.51;3.66;0.69
+15;988;Main and O'Rourke;2011;yes;1;10;;20;number;con;1;35;none;56;27;29;1;59.85;7.78;59.17;9.01;58.17;8.48;62.42;7.23
+16;985;Abdelhafez;2016;no;2;6;12;41;multiple areas;pc;1;36;none;40;12;28;;62.5;4.96;60.42;4.38;66.04;8.65;70.93;8.43
+17;611;Miller and Robertson;2010;yes;2;10;40;20;number;con;1;37;none;40;19;21;1;17.42;2.99;16;3.92;16.67;3.28;16.67;3.14
+18;935;Riconscente;2013;yes;1;1;5;20;number;app;1;38;multiple_outcomes;94;44;50;1;2.75;0.74;2.62;0.87;2.72;0.84;3.04;0.8
+18;935;Riconscente;2013;yes;1;1;5;20;number;app;2;39;multiple_outcomes;94;44;50;2;2.97;0.85;2.86;0.99;3.01;0.95;3.28;0.92
+19;990;McCue;2011;no;2;28;28;45;algebra;pc;1;40;multiple_outcomes;43;24;19;1;58.5;8;59.2;8.5;66;5.7;65.8;5.3
+19;990;McCue;2011;no;2;28;28;45;algebra;pc;2;41;multiple_outcomes;43;24;19;2;43.6;4.3;43.2;4.9;47.3;3;46.3;4.6
+19;990;McCue;2011;no;2;28;28;45;algebra;pc;3;42;multiple_outcomes;43;24;19;2;38.6;7.7;38.2;6.9;45.8;5.3;43.4;8
+19;990;McCue;2011;no;2;28;28;45;algebra;pc;4;43;multiple_outcomes;43;24;19;2;18.8;4.1;18.6;4.3;22.9;2.7;21.5;3.7
+20;1000;Sun-Lin and Chiou;2019;yes;1;4;4;40;algebra;pc;1;44;none;48;24;24;2;11.63;3.31;11;2.17;12.88;3.52;15;1.35
