@@ -218,7 +218,8 @@ publication_year <- function(data){
     filter(!duplicated(id))%>%
     ggplot()+
     geom_bar(aes(x=year), col="black", fill="lightblue")+
-    scale_x_continuous(breaks = seq(from=2005, to=2018, by=1))+
+    scale_x_continuous(breaks = seq(from=2005, to=2019, by=1), 
+                       labels = c(2005, "",2007,"",2009,"",2011,"",2013,"",2015,"",2017,"",2019))+
     theme(panel.grid.minor = element_blank())+
     xlab("Year of publication")+
     ylab("Number of studies")
@@ -290,7 +291,7 @@ effects_participants <- function(data){
     geom_point(aes(x=author_y, y=yi_dppc2, col=N_study),position= position_dodge2(.5))+
     geom_errorbar(aes(ymin=yi_dppc2-SE, ymax=yi_dppc2+SE,x=author_y, col=N_study/2),
                   position= position_dodge2(.5), width=.5)+
-    scale_y_continuous(breaks = seq(from=-.5, to=1, by=.25))+
+    scale_y_continuous(breaks = seq(from=-.75, to=1.5, by=.25))+
     scale_color_gradient(name = "Sample Size", trans = "log",
                          breaks = my_breaks, labels = my_breaks,
                          low="lightblue", high="darkblue")+

@@ -172,7 +172,8 @@ label_author_y =  data%>%
   mutate(author_y = recode(author_y,
     `Miller and Robertson (2011)` = "Miller \\& Robertson (2011)",
     `Main and O'Rourke (2011)` = "Main \\& O'Rourke (2011)",
-    `Miller and Robertson (2010)` = "Miller \\& Robertson (2010)"))
+    `Miller and Robertson (2010)` = "Miller \\& Robertson (2010)"),
+    `Sun-Lin and Chiou (2010)` = "Sun-Lin \\& Chiou (2010)")
 
 label_author_y_n_new =  data%>%
   arrange(N_study)%>%
@@ -181,7 +182,8 @@ label_author_y_n_new =  data%>%
   mutate(author_y = recode(author_y,
     `Miller and Robertson (2011)` = "Miller \\& Robertson (2011)",
     `Main and O'Rourke (2011)` = "Main \\& O'Rourke (2011)",
-    `Miller and Robertson (2010)` = "Miller \\& Robertson (2010)"))
+    `Miller and Robertson (2010)` = "Miller \\& Robertson (2010)"),
+    `Sun-Lin and Chiou (2010)` = "Sun-Lin \\& Chiou (2010)")
 @
   
   
@@ -218,7 +220,7 @@ in K-12}\\
 	\vfill
 
 % Bottom of the page
-	{\large \today\par}
+	{\large Last compiled\\ \today\par}
 	
 	\vspace{2cm}
 
@@ -369,7 +371,7 @@ To guarantee the reproducibility of the results, the whole analysis is structure
 
 The R-package \texttt{drake} \parencite{landauDrakePackagePipeline2018} is used to manage the analysis workflow and to enhance the readability and transparency of the analysis. To know more about \texttt{drake} consider the official Git-hub page (\url{https://github.com/ropensci/drake}) or the user manual(\url{https://books.ropensci.org/drake/}). Summarizing, using \texttt{drake} the code of the analysis is organized into different scripts. The user defines the plan of the analysis where each step in the analysis is defined trough functions. Functions can be appropriately defined to obtain desired targets (i.e., R-output with results of interests) and they are declared in another script. Subsequently, \texttt{drake} manages the whole analysis recognizing the dependency structure of the different targets. When any change is made to the code \texttt{drake} evaluates the analysis and updates the results. Using functions to define each step of the analysis allows to avoid "\textit{coping and paste}" in the code, it makes debugging easier, and it facilitates the reading of the code.
 
-Moreover, the R-package \texttt{renv} \parencite{usheyRenvProjectEnvironments2019} is used to manage the dependencies of the R-packages used in the analysis. The \texttt{renv} package allows to create an isolated, portable, and reproducible environment where the analyses are run. To know more about \texttt{renv} consider the official documentation (\url{https://rstudio.github.io/renv/articles/renv.html}).
+Moreover, the R-package \texttt{renv} \parencite{usheyRenvProjectEnvironments2019} is used to manage the dependencies of the R-packages used in the analysis. The \texttt{renv} package allows to create an isolated, portable, and reproducible environment where the analyses are run. However, \texttt{renv} is limited as it can not handle different R versions. Thus, to be fully reproducible users should use R version \Sexpr{paste0(c(version$major,".",version$minor), collapse="")}. To know more about \texttt{renv} consider the official documentation (\url{https://rstudio.github.io/renv/articles/renv.html}).
 
 Finally, git version control was used to track the changes during the analysis.
 
@@ -393,12 +395,25 @@ In the folder \texttt{Report\_analysis/}, it is possible to find the script used
 %-------------
 \subsubsection{Run the Analysis}
 
-In order to run the analysis follow these steps:
+To run the analysis you can follow two options: \textbf{A)} recreate a more reproducible enviroment using the same R version and packages versions; \textbf{B)} install the required packages and run the analysis.
+
+\paragraph{Option A: reproducible enviroment using \texttt{renv}.}
+
 \begin{enumerate}
+  \item{Install R version \Sexpr{paste0(c(version$major,".",version$minor), collapse="")} frmo CRAN and select it as the the R version used in RStudio (more info at this \href{https://support.rstudio.com/hc/en-us/articles/200486138-Changing-R-versions-for-RStudio-desktop}{link}).}
   \item{Make sure you have already the \texttt{renv} R-package installed in your library. If not, run the command in R or R-studio \texttt{install.packages("renv")}}
   \item{Open the R-project \texttt{DMGC\_Meta}  by double-clicking the file \texttt{DMGC\_Meta.Rproj} you can find in the main directory. A new R-studio session should open and a similar message should appear in the console if \texttt{renv} was correctly installed:\\
     \texttt{* Project '$\sim$/<your\_path>/DMGC\_Meta' loaded. [renv <version\_number>]}}
-  \item{Run the line \texttt{renv::restore()}, \texttt{renv} will ask the permission to install the R-packages used in the analysis, type \texttt{y} and return to confirm.}
+  \item{Run the line \texttt{renv::restore()}, \texttt{renv} will ask the permission to install the R-packages used in the analysis, type \texttt{y} and return to confirm. If this fails, it could be due to \texttt{renv} attempting to install packages from sources but system prerequisites for compilation of a package are missing. In this case run \texttt{renv::equip()} and try again (only supported on Windows; if using other operative systems ensure to have the required development tools). If this does not solve the problem, just run the analysis following option B described below.}
+  \item{Open the file `R/Analysis.R` and run each line of the sections "Load", "Check", and "Make".}
+  \item{Now you can access the targets with the results using the functions \texttt{drake::loadd(<name\_target>)} and \texttt{drake::readd(<name\_target>)}.}
+\end{enumerate}
+
+\paragraph{Option B: install required packages.}
+
+\begin{enumerate}
+  \item{Open the R-project \texttt{DMGC\_Meta}  by double-clicking the file \texttt{DMGC\_Meta.Rproj} you can find in the main directory. A new R-studio session should open.}
+  \item{Install the required packages running the line \texttt{install.packages(c("conflicted",  "tidyverse", "metafor", "clubSandwich", "drake", "gridExtra", "MAd", "visNetwork", "robumeta"))}}
   \item{Open the file `R/Analysis.R` and run each line of the sections "Load", "Check", and "Make".}
   \item{Now you can access the targets with the results using the functions \texttt{drake::loadd(<name\_target>)} and \texttt{drake::readd(<name\_target>)}.}
 \end{enumerate}
@@ -418,7 +433,7 @@ In this section, first the raw dataset is presented, then the dataset is prepare
 
 In the folder \texttt{Data/}, you can find the file \texttt{Dataset.csv} with all the informations about the selected studies. The dataset includes \Sexpr{nrow(data_raw)} effects sizes grouped within \Sexpr{length(unique(data_raw$study))} different studies. Each line of the dataset is an effect and the characteristics of each effect are summarized in \Sexpr{ncol(data_raw)} variables:
 \begin{enumerate}
-  \item{\texttt{study}} - Numerical variable that indicates the id number of the study. This id number is used in the analysis to refer to a specific study. Values range from \texttt{1} to \texttt{19}.
+  \item{\texttt{study}} - Numerical variable that indicates the id number of the study. This id number is used in the analysis to refer to a specific study. Values range from \texttt{1} to \texttt{20}.
   \item{\texttt{id}} - Numerical variable that indicates the id number of the study used during the selection process of eligible studies.
   \item{\texttt{author}} - Character string with the names of the authors.
   \item{\texttt{year}} - Numerical variable that indicates the year of publication.\footnote{In the case of unpublished dissertations or grey-literature the year refers to the realization of the study}.
@@ -430,7 +445,7 @@ In the folder \texttt{Data/}, you can find the file \texttt{Dataset.csv} with al
   \item{\texttt{math\_area}} - Character string that indicates the math area target of the treatment. Algebra (\texttt{algebra}), geometry (\texttt{geometry}), number (\texttt{number}), or multiple areas (\texttt{multiple\_areas}).
   \item{\texttt{device}} - Character string that indicates the device used during the treatment. Personal Computer (\texttt{pc}), console (\texttt{con}), or application on other device (\texttt{app}).
   \item{\texttt{n\_effect}} - Numerical variable that identifies within each study the different effects. In each study the first effect is identified with \texttt{1}, then the value increases if more effects are reported within the same study. 
-  \item{\texttt{id\_effect}} - Numerical variable that identifies the unique effect. Values range from \texttt{1} to \texttt{43}.
+  \item{\texttt{id\_effect}} - Numerical variable that identifies the unique effect. Values range from \texttt{1} to \texttt{44}.
   \item{\texttt{dependence}} - Character string that indicates the type of dependence among different effect sizes reported within the same study. Study with single effect size (\texttt{none}), multiple effects measured on the same participants (\texttt{multiple\_outcomes}), multiple comparison between different experimental groups and same control group (\texttt{multiple\_groups}), or independent effect sizes (\texttt{independent}). 
   \item{\texttt{N}} - Numerical variable that indicates the total number of participants included to compute the considered effect. This is not always equal to the total number of participants in the study, as multiple experimental or control groups cold be included in the study.
   \item{\texttt{n\_cg}} - Numerical variable that indicates the number of participants in the control group for the considered effect.
@@ -491,7 +506,7 @@ Simply looking at the effect obtained, we observe a strange value. In \textcite{
 show_hung
 @
 
-Considering the measure in the pre-test we can understand the problem. The standard deviation in the pre-test are extremely low: \Sexpr{show_hung%>%filter(id_effect==33)%>%select(starts_with("sd_t1"))%>%round(.,2)%>%paste(., collapse=" and ")}. This leads to a low value for the pooled standard deviation and in turns an implausible high value of effect size. That is probably given by the fact that the measure used was not able to evaluate properly the variation among individuals in the pre-test, (maybe floor effect).
+Considering the measure in the pre-test we can understand the problem. The standard deviation in the pre-test are extremely low: \Sexpr{show_hung%>%filter(id_effect==33)%>%select(starts_with("sd_t1"))%>%round(.,2)%>%paste(., collapse=" and ")}. This leads to a low value for the pooled standard deviation and in turns an implausible high value of effect size. That is probably given by the fact that the measure used was not able to evaluate properly the variation among individuals in the pre-test (maybe floor effect).
 
 We do not include this effect in the meta-analysis and we remove it from the dataset. Thus the final dataset includes \Sexpr{length(unique(data$id_effect))} different effects.
 
@@ -515,12 +530,12 @@ In this section we describe the main characteristics of the studies included in 
 
 In the analysis we include \Sexpr{length(unique(data$study))} studies and \Sexpr{length(unique(data$id_effect))} different effects. Studies were published between \Sexpr{min(data$year)} and \Sexpr{max(data$year)} and most of the studies are published after 2010. The number of studies according to year of publication is presented in Figure~\ref{fig:Plot_dist_year}.
 
-<<Plot_dist_year, fig.pos="H", fig.align="center", fig.height=3, fig.width=4, fig.cap="Number of studies according to year of pubblication ($n_{studies}=19$).", fig.scap="Number of studies according to year of pubblication">>=
+<<Plot_dist_year, fig.pos="H", fig.align="center", fig.height=3, fig.width=4, fig.cap="Number of studies according to year of pubblication ($n_{studies}=20$).", fig.scap="Number of studies according to year of pubblication">>=
 
 readd(plot_publication_year)
 @
 
-The majority of the studies were published in a peer reviewed journal, but \Sexpr{table_freq_pub$n[1]} studies were obtained from conference papers or unpublished dissertations (see Table~\ref{tab:Table_freq_pub}).
+The majority of the studies were published in a peer reviewed journal, \Sexpr{table_freq_pub$n[1]} studies instead were obtained from conference papers or unpublished dissertations (see Table~\ref{tab:Table_freq_pub}).
 
 \codestreach
 <<Table_freq_pub>>=
@@ -532,17 +547,17 @@ table_freq_pub%>%
   kable("latex", booktabs=T,align = c("r","c"),col.names = c("Publication","Frequency"),caption = "Type of publication.",escape=F) %>%
     row_spec(0,bold = T, align = "c") %>%
   kable_styling(position = "center", latex_options = "HOLD_position")%>%
-  footnote(general = "$n_{studies}=19$",footnote_as_chunk = T,escape=F)
+  footnote(general = "$n_{studies}=20$",footnote_as_chunk = T,escape=F)
 @
 
-The total number of participants included in each study range from \Sexpr{min(data$N)} to \Sexpr{max(data$N)} and the majority of the studies included less than 150 participants. The number of participants for each study is presented in Figure~\ref{fig:Plot_dist_sample}
+The total number of participants included in each study range from \Sexpr{min(data$N)} to \Sexpr{max(data$N)} and the majority of the studies included less than 150 participants. The number of participants for each study is presented in Figure~\ref{fig:Plot_dist_sample}.
 
-<<Plot_dist_sample, fig.pos="H", fig.align="center", fig.height=5, fig.width=5, fig.cap="Number of participants included in each study ($n_{studies}=19$).", fig.scap="Number of participants included in each study">>=
+<<Plot_dist_sample, fig.pos="H", fig.align="center", fig.height=5, fig.width=5, fig.cap="Number of participants included in each study ($n_{studies}=20$).", fig.scap="Number of participants included in each study">>=
 readd(plot_participants_studies)
 @
 
 
-The studies included in the meta-analysis differ according to the school grade of the participants. In more than a half of the studies, participants were primary school students and in the other studies participants were secondary school students (see Table~\ref{tab:Table_freq_grade}).
+The studies included in the meta-analysis differ according to the school grade of the participants. In \Sexpr{table_freq_grade%>%filter(grade=="Primary")%>%select(n)} studies, participants came form primary schools and in the remaining studies participants came from secondary schools (see Table~\ref{tab:Table_freq_grade}).
 
 <<Table_freq_grade>>=
 table_freq_grade%>%
@@ -550,10 +565,10 @@ table_freq_grade%>%
   kable("latex", booktabs=T,align = c("r","c"),col.names = c("School grade","Frequency"),caption = "Participants school grade.",escape=F) %>%
     row_spec(0,bold = T, align = "c") %>%
   kable_styling(position = "center", latex_options = "HOLD_position")%>%
-  footnote(general = "$n_{studies}=19$",footnote_as_chunk = T,escape=F)
+  footnote(general = "$n_{studies}=20$",footnote_as_chunk = T,escape=F)
 @
 
-Regarding the math area target of the treatment, \Sexpr{table_freq_math_area%>%filter(math_area=="number")%>%select(n)} studies focused on numbers, \Sexpr{table_freq_math_area%>%filter(math_area=="algebra")%>%select(n)} studies on algebra, only one study on geometry and \Sexpr{table_freq_math_area%>%filter(math_area=="mulitple_areas")%>%select(n)} focused on multiple areas (see Table~\ref{tab:Table_freq_math_area}).
+Regarding the math area target of the treatment, \Sexpr{table_freq_math_area%>%filter(math_area=="number")%>%select(n)} studies focused on numbers, \Sexpr{table_freq_math_area%>%filter(math_area=="algebra")%>%select(n)} studies on algebra, only one study on geometry and \Sexpr{table_freq_math_area%>%filter(math_area=="multiple_areas")%>%select(n)} focused on multiple areas (see Table~\ref{tab:Table_freq_math_area}).
 
 <<Table_freq_math_area>>=
 table_freq_math_area%>%
@@ -561,18 +576,18 @@ table_freq_math_area%>%
   kable("latex", booktabs=T,align = c("r","c"),col.names = c("Math area","Frequency"),caption = "Math area target of the treatment.",escape=F) %>%
     row_spec(0,bold = T, align = "c") %>%
   kable_styling(position = "center", latex_options = "HOLD_position")%>%
-  footnote(general = "$n_{studies}=19$",footnote_as_chunk = T,escape=F)
+  footnote(general = "$n_{studies}=20$",footnote_as_chunk = T,escape=F)
 @
 
 
-Considering the device used in the treatment, the large part of the studies used the Personal Computer. Only \Sexpr{table_freq_device%>%filter(device=="Console")%>%select(n)} studies used different type of console and \Sexpr{table_freq_device%>%filter(device=="App")%>%select(n)} studies involved the use of Applications (see Table~\ref{tab:Table_freq_device}).
+Considering the device used in the treatment, the large majority of the studies used the Personal Computer. Only \Sexpr{table_freq_device%>%filter(device=="Console")%>%select(n)} studies used different type of console and \Sexpr{table_freq_device%>%filter(device=="App")%>%select(n)} studies involved the use of Applications (see Table~\ref{tab:Table_freq_device}).
 
 <<Table_freq_device>>=
 table_freq_device%>%
   kable("latex", booktabs=T,align = c("r","c"),col.names = c("Device","Frequency"),caption = "Device used in the treatment.",escape=F) %>%
     row_spec(0,bold = T, align = "c") %>%
   kable_styling(position = "center", latex_options = "HOLD_position")%>%
-  footnote(general = "$n_{studies}=19$",footnote_as_chunk = T,escape=F)
+  footnote(general = "$n_{studies}=20$",footnote_as_chunk = T,escape=F)
 @
 
 The duration of the treatment range from \Sexpr{min(data$weeks)} week to \Sexpr{max(data$weeks)} weeks. In Table~\ref{tab:Table_freq_weeks} studies are grouped according to approximate duration of the treatment.
@@ -582,7 +597,7 @@ table_freq_weeks%>%
   kable("latex", booktabs=T,align = c("r","c"),col.names = c("Duration","Frequency"),caption = "Duration of treatment in weeks.",escape=F) %>%
     row_spec(0,bold = T, align = "c") %>%
   kable_styling(position = "center", latex_options = "HOLD_position")%>%
-  footnote(general = "Maximum value is 28 weeks; $n_{studies}=19$",footnote_as_chunk = T,escape=F)
+  footnote(general = "Maximum value is 28 weeks; $n_{studies}=20$",footnote_as_chunk = T,escape=F)
 @
 
 In Table~\ref{tab:Table_n_studies_effects} the frequency of studies according to the number of effects is reported. Th majority of the studies include only one effect, all the other studies include between 2 and 4 effects, except one study with 8 effects.
@@ -594,7 +609,7 @@ table_n_effects_studies%>%
   kable("latex", booktabs=T,align = rep("c",2),col.names = c("Effects within study", "Number of studies"),caption = "Frequency of studies according to the number of effects.") %>%
     row_spec(0,bold = T, align = "c") %>%
   kable_styling(position = "center", latex_options = "HOLD_position")%>%
-  footnote(general = "$n_{studies}=19$; $n_{effects}=42$",footnote_as_chunk = T,escape=F)
+  footnote(general = "$n_{studies}=20$; $n_{effects}=43$",footnote_as_chunk = T,escape=F)
 @
 
 Studies with multiple effect size differ according to the type of dependency between effects. In \Sexpr{table_freq_dependence%>%filter(dependence=="multiple_outcomes")%>%select(n)} studies outcomes where measured on the same participants. Only \Sexpr{table_freq_dependence%>%filter(dependence=="multiple_groups")%>%select(n)} study included multiple independent treatment groups compared to a single control group and another study included multiple independent treatment groups and independent control groups (see Table~\ref{tab:Table_freq_dependence}). 
@@ -605,7 +620,7 @@ table_freq_dependence%>%
   kable("latex", booktabs=T,align = c("r","c"),col.names = c("Dependency", "Frequency"),caption = "Type of dependency among effect sizes within the same study.") %>%
   row_spec(0,bold = T, align = "c") %>%
   kable_styling(position = "center", latex_options = "HOLD_position")%>%
-  footnote(general = "$n_{studies}=19$",footnote_as_chunk = T,escape=F)
+  footnote(general = "$n_{studies}=20$",footnote_as_chunk = T,escape=F)
 @
 
 %------------------------
@@ -613,7 +628,7 @@ table_freq_dependence%>%
 
 In Figure~\ref{fig:Plot_dist_effects} the estimated effect sizes of each study are presented together with confidence intervals. The studies are ordered according to the total number of participants included and multiple outcomes from the same study are grouped together. We can observe the high variability between effects and how with the increasing of the sample size effects tend to be smaller.
 
-<<Plot_dist_effects, fig.pos="t!", fig.align="center", fig.height=5, fig.width=6, fig.cap="Estimated effect size according to number of participants ($n_{studies}=19$; $n_{effects}=42$).", fig.scap="Estimated effect size according to number of participants">>=
+<<Plot_dist_effects, fig.pos="t!", fig.align="center", fig.height=5, fig.width=6, fig.cap="Estimated effect size according to number of participants ($n_{studies}=20$; $n_{effects}=43$).", fig.scap="Estimated effect size according to number of participants">>=
 readd(plot_effects_participants)
 @
 
@@ -625,7 +640,7 @@ table_freq_mot%>%
   kable("latex", booktabs=T,align = c("r","c"),col.names = c("Motivation measure", "Frequency"),caption = "Effect sizes according to the type of motivation measure.") %>%
   row_spec(0,bold = T, align = "c") %>%
   kable_styling(position = "center", latex_options = "HOLD_position")%>%
-  footnote(general = "$n_{effects} = 42$",footnote_as_chunk = T,escape=F)
+  footnote(general = "$n_{effects} = 43$",footnote_as_chunk = T,escape=F)
 @
 
 \clearpage
@@ -646,9 +661,9 @@ In this section, first we present the results of the meta-analysis. Then sensiti
 \subsubsection{Variance-covariance matrix}
 In order to compute a multilevel meta-analysis we need first to define for each study the variance-covariance matrix according to the specific dependence structure between effect sizes.
 
-As we have seen in Table~\ref{tab:Table_freq_dependence} only \Sexpr{table_freq_dependence%>%filter(dependence != "none")%>%select(n)%>%sum()} studies include multiple effect size. In the case of two outcomes (A and B) measured on the same subjects, the covariance between outcomes ($cov(AB)$) can be computed knowing the variance of the two outcomes ($\sigma_A^2$ and  $\sigma_B^2$) and their correlation ($\rho_{AB}$):
+As we have seen in Table~\ref{tab:Table_freq_dependence} only \Sexpr{table_freq_dependence%>%filter(dependence != "none")%>%select(n)%>%sum()} studies include multiple effect size. In the case of two outcomes (A and B) measured on the same subjects, the covariance between outcomes ($cov(A, B)$) can be computed knowing the variance of the two outcomes ($\sigma_A^2$ and  $\sigma_B^2$) and their correlation ($\rho_{AB}$):
 \begin{equation}
-  cov(AB) = \rho_{AB}*\sigma_A\sigma_B.
+  cov(A, B) = \rho_{AB}*\sigma_A\sigma_B.
 \end{equation}
 The same formula applies for each couple of outcomes when multiple outcomes were measured. The variance-covariance matrix ($\Sigma$) can be computed as the product between the diagonal matrix that includes the outcomes standard deviation ($diag(S)$) and the correlation matrix ($Corr$):
 \begin{equation}
@@ -692,15 +707,16 @@ cbind(Coef="Intercept",
       sig="**")%>%
   mutate_at(2:5, round,2)%>%
   mutate_at(6, round, 4)%>%
+  mutate_at(6, format, scientific=F)%>%
   kable("latex", booktabs=T,align = rep("c",7),col.names = c("Coefficient","Estimate","SE", "t-value","df","p-value", "Sig."),caption = "Coefficients test for \\texttt{fit\\_rma\\_mv}", row.names = FALSE) %>%
   row_spec(0,bold = T, align = "c") %>%
   kable_styling(position = "center", latex_options = "HOLD_position")%>%
-  footnote(general = "$n_{studies}=19$; $n_{effects}=42$",footnote_as_chunk = T,escape=F)
+  footnote(general = "$n_{studies}=20$; $n_{effects}=43$",footnote_as_chunk = T,escape=F)
 @
 
 The results indicate that the treatments have a significant small-effect ($d_{ppc2} = \Sexpr{round(fit_rma_mv$coef_test[,1],2)}$). However, the confidence interval ($95\% CI = [\Sexpr{paste0(round(fit_rma_mv$ci.lb,2),"; ", round(fit_rma_mv$ci.ub,2))}]$) range from very small-effects to medium effects indicating that there is a high level of uncertainty in the estimation. Moreover, results show high levels of heterogeneity in the studies included in the meta-analysis. The Q-statistic is significant $Q(\text{df}=\Sexpr{fit_rma_mv$k-1}) = \Sexpr{round(fit_rma_mv$QE,2)}$ and $I^2$ value is high ($I^2 = \Sexpr{round(fit_rma_mv$I_squared,1)}$\%). The Forest plot is presented in Figure~\ref{fig:Plot_forest_fit_rma}.
 
-<<Plot_forest_fit_rma, fig.pos="!ht", fig.align="center", fig.height=8.5, fig.width=6.5, fig.cap="Forest plot of the multilevel meta-analysis ($n_{studies}=19$; $n_{effects}=42$).", fig.scap="Forest plot of the multilevel meta-analysis.">>=
+<<Plot_forest_fit_rma, fig.pos="!ht", fig.align="center", fig.height=8.5, fig.width=6.5, fig.cap="Forest plot of the multilevel meta-analysis ($n_{studies}=20$; $n_{effects}=43$).", fig.scap="Forest plot of the multilevel meta-analysis.">>=
 plot_forest
 @
 
@@ -773,7 +789,7 @@ sens_summary_plot(sens_summary)
 %------------------------
 \subsubsection{\textit{Leave-One-Out} analysis}
 
-To assess the possible presence of influential studies, we re-run the multilevel meta-analysis removing one study at time, thus we fit 19 different models. The complete results of each different model are saved in the R-object \texttt{sens\_loo\_summary} that can be loaded using the \texttt{drake} function \texttt{loadd(sens\_loo\_summary)}. The summary results are reported in Table~\ref{tab:Table_loo_summary} and presented in Figure~\ref{fig:Plot_loo_summary}.
+To assess the possible presence of influential studies, we re-run the multilevel meta-analysis removing one study at time, thus we fit 20 different models. The complete results of each different model are saved in the R-object \texttt{sens\_loo\_summary} that can be loaded using the \texttt{drake} function \texttt{loadd(sens\_loo\_summary)}. The summary results are reported in Table~\ref{tab:Table_loo_summary} and presented in Figure~\ref{fig:Plot_loo_summary}.
 
 <<Table_loo_summary>>=
 table_report_loo = table_loo_summary%>%
@@ -802,7 +818,7 @@ Moreover, to evaluate the presence of influential studies we compute Cook's dist
 
 However, as suggested by \textcite{foxRegressionDiagnosticsVol1991}, a better option is to consider the graphical representation of Cook's distances to examine if there are cases that present a substantially larger distance than the rest. In Figure~\ref{fig:Plot_cook} we can observe a homogeneous distribution of distances. Thus, we can conclude that there are no influential cases. 
 
-<<Plot_cook, fig.pos="!ht", fig.align="center", fig.height=3.5, fig.width=6.5, fig.cap="Cook's distance of each study ($n_{studies}=19$).", fig.scap="Cook's distance of each study.">>=
+<<Plot_cook, fig.pos="!ht", fig.align="center", fig.height=3.5, fig.width=6.5, fig.cap="Cook's distance of each study ($n_{studies}=20$).", fig.scap="Cook's distance of each study.">>=
 readd(plot_cook)
 @
 
@@ -813,7 +829,7 @@ To evaluate the presence of publication bias in the studies selected in the meta
 
 However, this is not the optimal way to represent and evaluate the presence of publication bias, as studies with multiple effects are overrepresented in the plot respect to studies with only one effect.
 
-<<Plot_funnel_mv, fig.pos="!ht", fig.align="center", fig.height=4.5, fig.width=5.5, fig.cap="Funnel plot of the multilevel meta-analysis ($n_{studies}=19$; $n_{effects}=42$).", fig.scap="Funnel plot of the multilevel meta-analysis.">>=
+<<Plot_funnel_mv, fig.pos="!ht", fig.align="center", fig.height=4.5, fig.width=5.5, fig.cap="Funnel plot of the multilevel meta-analysis ($n_{studies}=20$; $n_{effects}=43$).", fig.scap="Funnel plot of the multilevel meta-analysis.">>=
 par(mar = c(4, 4, 0, 4))
 funnel(fit_rma_mv)
 @
@@ -834,9 +850,9 @@ summary(egger_regression_vi_dppc2)
 egger_regression_N$coef_test[2,1]
 @
 
-In both cases the test of moderators is significant. For the sample size, we have $QM(df = \Sexpr{egger_regression_N$p.eff-1}) = \Sexpr{round(egger_regression_N$QM,2)}$, $p-value = \Sexpr{round(egger_regression_N$QMp,3)}$ and the parameter coefficient ($\beta = \Sexpr{paste(round(egger_regression_N$coef_test[2,1],5))}$) indicates that the expected effect size decreases as the study sample size increases. Note that even if the parameter value is small it refers to the effect of adding one participant, so for large sample size the changes may be remarkable.
+In both cases the test of moderators is significant. For the sample size, we have $QM(df = \Sexpr{egger_regression_N$p.eff-1}) = \Sexpr{round(egger_regression_N$QM,2)}$, \textit{p-value}$ = \Sexpr{round(egger_regression_N$QMp,3)}$ and the parameter coefficient ($\beta = \Sexpr{paste(round(egger_regression_N$coef_test[2,1],5))}$) indicates that the expected effect size decreases as the study sample size increases. Note that even if the parameter value is small it refers to the effect of adding one participant, so for large sample size the changes may be remarkable.
 
-For the sampling variance, we have $QM(df = \Sexpr{egger_regression_vi_dppc2$p.eff-1}) = \Sexpr{round(egger_regression_vi_dppc2$QM,2)}$, $p-value = \Sexpr{round(egger_regression_vi_dppc2$QMp,3)}$ and the parameter coefficient ($\beta = \Sexpr{round(egger_regression_vi_dppc2$coef_test[2,1],2)}$) indicates that, when the sapling variance decreases (i.e., more precise studies), the expected effect size decreases as well.
+For the sampling variance, we have $QM(df = \Sexpr{egger_regression_vi_dppc2$p.eff-1}) = \Sexpr{round(egger_regression_vi_dppc2$QM,2)}$, \textit{p-value}$ = \Sexpr{round(egger_regression_vi_dppc2$QMp,3)}$ and the parameter coefficient ($\beta = \Sexpr{round(egger_regression_vi_dppc2$coef_test[2,1],2)}$) indicates that, when the sapling variance decreases (i.e., more precise studies), the expected effect size decreases as well.
 
 In addition to the previous tests, we also report results of the rank correlation test that confirm the correlation between the observed outcomes and the corresponding sampling variances \parencite{beggOperatingCharacteristicsRank1994}. 
 
@@ -850,9 +866,9 @@ Finally, we present the funnel plot with the \textit{trim-and-fill} method consi
 trim_fill_aggregated
 @
 
-The results indicate that, to obtain symmetry, five hypothetical studies have to be added. The resulting treatments effect is still significant, but the effect size is very small ($d_{ppc2}= \Sexpr{round(trim_fill_aggregated$beta,2)}$).
+The results indicate that, to obtain symmetry, five hypothetical studies have to be added. The resulting treatments effect is still significant, but the effect size is smaller than the initial one ($d_{ppc2}= \Sexpr{round(trim_fill_aggregated$beta,2)}$).
 
-<<Plot_funnel_aggregated, fig.pos="!ht", fig.align="center", fig.height=4.5, fig.width=5.5, fig.cap="Funnel plot with \\textit{trim-and-fill} method for meta-analysis with aggregated effects (white dots are the added studies; $n_{studies}=19$; $n_{effects}=42$).", fig.scap="Funnel plot with \\textit{trim-and-fill} method for meta-analysis with aggregated effects.">>=
+<<Plot_funnel_aggregated, fig.pos="!ht", fig.align="center", fig.height=4.5, fig.width=5.5, fig.cap="Funnel plot with \\textit{trim-and-fill} method for meta-analysis with aggregated effects (white dots are the added studies; $n_{studies}=20$; $n_{effects}=43$).", fig.scap="Funnel plot with \\textit{trim-and-fill} method for meta-analysis with aggregated effects.">>=
 par(mar = c(4, 4, 0, 4))
 funnel(trim_fill_aggregated)
 @
@@ -924,13 +940,13 @@ However, this results have to be considered with caution given the great heterog
 \begin{refsection}
 
 \nocite{abdelhafezEffectsGamebasedTechnology2016}
-\nocite{baiAssessingEffectiveness3D2012a}
+\nocite{baiAssessingEffectiveness3D2012}
 \nocite{changEffectsEducationalVideo2016}
 \nocite{hungEffectsDigitalGamebased2014}
 \nocite{ke2006computer}
-\nocite{keAlternativeGoalStructures2008a}
-\nocite{kebritchiEffectsModernMathematics2010a}
-\nocite{kimGamebasedLearningOpenSimsupported2017a}
+\nocite{keAlternativeGoalStructures2008}
+\nocite{kebritchiEffectsModernMathematics2010}
+\nocite{kimGamebasedLearningOpenSimsupported2017}
 \nocite{kuEffectsMinigamesStudents2014a}
 \nocite{mainNewDirectionsTraditional2011}
 \nocite{martinEffectGameBasedLearning2018a}
@@ -942,7 +958,7 @@ However, this results have to be considered with caution given the great heterog
 \nocite{riconscenteResultsControlledStudy2013}
 \nocite{rodriguez-aflechtNumberNavigationGame2015}
 \nocite{starkeyEffectsDigitalGames2013a}
-
+\nocite{sun-linEffectsGamifiedComparison2019}
 
 \printbibliography[heading=subbibliography, title= Studies included in the meta-analysis]
 \end{refsection}
