@@ -98,9 +98,9 @@ options(knitr.kable.NA = '')
 theme_set(theme_classic()+
           theme(text = element_text(size=12)))
 
-knitr::read_chunk("../R/Functions.R")
-source("../R/Functions.R") # defines functions
-source("../R/Auxiliary_functions.R") # Auxiliary functions
+knitr::read_chunk("../../R/Functions.R")
+source("../../R/Functions.R") # defines functions
+source("../../R/Auxiliary_functions.R") # Auxiliary functions
 
 #----    load drake results    ----
 
@@ -389,8 +389,7 @@ In the folder \texttt{R/}, the R-scripts used in the analysis are stored. Using 
   \item{\texttt{Analysis.R}} is the script used to run the whole analysis.
 \end{itemize}
 
-In the folder \texttt{Report\_analysis/}, it is possible to find the script used to compile the present report.
-
+In the folder \texttt{Documents/}, it is possible to find the material used to compile the \textit{Analysis Report} (see folder \texttt{Report\_analysis}) and the \textit{Prisma flow diagram} (see folder \texttt{Prisma}).
 
 %-------------
 \subsubsection{Run the Analysis}

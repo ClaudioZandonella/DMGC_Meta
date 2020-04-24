@@ -29,7 +29,7 @@ In the folder `R/`, the R-scripts used in the analysis are stored. Using the `dr
 - [Analysis.R](R/Analysis.R) is the script used to run the whole analysis.
 
 
-In the folder `Report_analysis/`, it is possible to find the script used to compile the *Analysis Report*.
+In the folder `Documents/`, it is possible to find the material used to compile the *Analysis Report* (see folder `Report_analysis`) and the *Prisma flow diagram* (see folder `Prisma`).
 
 
 ### Run the Analysis
