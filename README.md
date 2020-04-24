@@ -39,7 +39,7 @@ To run the analysis you can follow two options: **A)** recreate a more reproduci
 
 **Option A: reproducible enviroment using `renv`.**
 
-1.  Install R version 3.6.1 frmo CRAN and select it as the the R version used in RStudio (more info at this [link](https://support.rstudio.com/hc/en-us/articles/200486138-Changing-R-versions-for-RStudio-desktop).
+1.  Install R version 3.6.1 from CRAN and select it as the the R version used in RStudio (more info at this [link](https://support.rstudio.com/hc/en-us/articles/200486138-Changing-R-versions-for-RStudio-desktop).
 2. Make sure you have already the `renv` R-package installed in your library. If not, run the command in R or R-studio `install.packages("renv")`
 3. Open the R-project `DMGC_Meta`  by double-clicking the file `DMGC_Meta.Rproj` you can find in the main directory. A new R-studio session should open and a similar message should appear in the console if `renv` was correctly installed:
 

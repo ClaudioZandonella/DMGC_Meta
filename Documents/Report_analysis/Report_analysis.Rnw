@@ -399,7 +399,7 @@ To run the analysis you can follow two options: \textbf{A)} recreate a more repr
 \paragraph{Option A: reproducible enviroment using \texttt{renv}.}
 
 \begin{enumerate}
-  \item{Install R version \Sexpr{paste0(c(version$major,".",version$minor), collapse="")} frmo CRAN and select it as the the R version used in RStudio (more info at this \href{https://support.rstudio.com/hc/en-us/articles/200486138-Changing-R-versions-for-RStudio-desktop}{link}).}
+  \item{Install R version \Sexpr{paste0(c(version$major,".",version$minor), collapse="")} from CRAN and select it as the the R version used in RStudio (more info at this \href{https://support.rstudio.com/hc/en-us/articles/200486138-Changing-R-versions-for-RStudio-desktop}{link}).}
   \item{Make sure you have already the \texttt{renv} R-package installed in your library. If not, run the command in R or R-studio \texttt{install.packages("renv")}}
   \item{Open the R-project \texttt{DMGC\_Meta}  by double-clicking the file \texttt{DMGC\_Meta.Rproj} you can find in the main directory. A new R-studio session should open and a similar message should appear in the console if \texttt{renv} was correctly installed:\\
     \texttt{* Project '$\sim$/<your\_path>/DMGC\_Meta' loaded. [renv <version\_number>]}}
