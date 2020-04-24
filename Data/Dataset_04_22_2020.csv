@@ -42,4 +42,4 @@ study;id;author;year;pub;grade;weeks;sessions;minutes;math_area;device;n_effect;
 19;990;McCue;2011;no;2;28;28;45;algebra;pc;2;41;multiple_outcomes;43;24;19;2;43.6;4.3;43.2;4.9;47.3;3;46.3;4.6
 19;990;McCue;2011;no;2;28;28;45;algebra;pc;3;42;multiple_outcomes;43;24;19;2;38.6;7.7;38.2;6.9;45.8;5.3;43.4;8
 19;990;McCue;2011;no;2;28;28;45;algebra;pc;4;43;multiple_outcomes;43;24;19;2;18.8;4.1;18.6;4.3;22.9;2.7;21.5;3.7
-20;1000;Sun-Lin and Chiou;2019;yes;1;4;4;40;algebra;pc;1;44;none;48;24;24;2;11.63;3.31;11;2.17;12.88;3.52;15;1.35
+20;1000;Sun-Lin and Chiou;2019;yes;2;4;4;40;algebra;pc;1;44;none;48;24;24;NA;11.63;3.31;11;2.17;12.88;3.52;15;1.35
