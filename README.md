@@ -1,9 +1,9 @@
-# Meta-analysis 
+# Supplemantal Material of “The effects of educational video-games on students motivation to math: A meta-analysis in K-12”
 
 
 ### Summary
 
-This R-project contains all the material and the scripts used to conduct the meta-analysis.
+This repository contains all the supplemantal material  and the analysis scripts used for the article *“The effects of educational video-games on students motivation to math: A meta-analysis in K-12”*.
 
 ### Analysis reproducibility
 
@@ -29,7 +29,7 @@ In the folder `R/`, the R-scripts used in the analysis are stored. Using the `dr
 - [Analysis.R](R/Analysis.R) is the script used to run the whole analysis.
 
 
-In the folder `Documents/`, it is possible to find the material used to compile the *Analysis Report* (see folder `Report_analysis`) and the *Prisma flow diagram* (see folder `Prisma`).
+In the folder `Documents/`, it is possible to find the material used to compile the [Analysis Report](Documents/Report_analysis/Report_analysis.pdf) (see folder `Report_analysis`) and the [Prisma flow diagram](Documents/Prisma/Prisma.pdf) (see folder `Prisma`).
 
 
 ### Run the Analysis
