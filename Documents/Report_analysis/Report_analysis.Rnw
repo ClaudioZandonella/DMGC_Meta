@@ -35,7 +35,7 @@
 \setlist[enumerate]{itemsep=0ex} % reduce space between items
 \setlist[itemize]{itemsep=0ex} % reduce space between items
 \usepackage[labelfont=bf]{caption}  % caption
-\usepackage[style=apa,backend=biber]{biblatex}  % bibliografia
+\usepackage[style=apa, backend=biber]{biblatex}  % bibliografia
 \addbibresource{DMGC_Meta.bib}
 
 \usepackage{hyperref}    % ref between elements
@@ -662,11 +662,11 @@ In order to compute a multilevel meta-analysis we need first to define for each 
 
 As we have seen in Table~\ref{tab:Table_freq_dependence} only \Sexpr{table_freq_dependence%>%filter(dependence != "none")%>%select(n)%>%sum()} studies include multiple effect size. In the case of two outcomes (A and B) measured on the same subjects, the covariance between outcomes ($cov(A, B)$) can be computed knowing the variance of the two outcomes ($\sigma_A^2$ and  $\sigma_B^2$) and their correlation ($\rho_{AB}$):
 \begin{equation}
-  cov(A, B) = \rho_{AB}*\sigma_A\sigma_B.
+  cov(A, B) = \rho_{AB} \times \sigma_A\sigma_B.
 \end{equation}
 The same formula applies for each couple of outcomes when multiple outcomes were measured. The variance-covariance matrix ($\Sigma$) can be computed as the product between the diagonal matrix that includes the outcomes standard deviation ($diag(S)$) and the correlation matrix ($Corr$):
 \begin{equation}
-   \Sigma =  diag(S)*Corr*diag(S).
+   \Sigma =  diag(S)\times Corr\times diag(S).
 \end{equation}
 
 However, none of the studies reported the correlation between values. Thus, variance-covariance matrix is computed with a range of different correlation values between outcomes and influence on the results is evaluated.
@@ -753,7 +753,7 @@ summary(fit_rma)
 %------------------------
 \subsubsection{Sensitivity correlation values}
 
-To evaluate the influence of the correlation between pre-test and post-test scores (\texttt{r\_pre\_post}) and the influence of the correlation between outcomes (\texttt{r\_outcomes}), we run the multilevel meta-analysis trying different combination of values. The $d_{ppc2}$ sampling variance was previously computed considering high values (\texttt{r\_pre\_post}=0.8), medium-high values (\texttt{r\_pre\_post}=0.6), medium.low values (\texttt{r\_pre\_post}=0.4), and low values (\texttt{r\_pre\_post}=0.2) for the pre- post-test correlation (see Section~\ref{sec:effect_variance}).
+To evaluate the influence of the correlation between pre-test and post-test scores (\texttt{r\_pre\_post}) and the influence of the correlation between outcomes (\texttt{r\_outcomes}), we run the multilevel meta-analysis trying different combination of values. The $d_{ppc2}$ sampling variance was previously computed considering high values (\texttt{r\_pre\_post} = 0.8), medium-high values (\texttt{r\_pre\_post} = 0.6), medium.low values (\texttt{r\_pre\_post} = 0.4), and low values (\texttt{r\_pre\_post} = 0.2) for the pre- post-test correlation (see Section~\ref{sec:effect_variance}).
 
 For all conditions, several multilevel meta-analyses are run varying the correlation between outcomes used to compute the variance-covariance matrix. The sequence of values considered for the \texttt{r\_outcomes} range from 0.1 to 0.9 with increments of 0.1. Thus, in the sensitivity analysis \Sexpr{nrow(sens_summary)} different models are fitted.
 
