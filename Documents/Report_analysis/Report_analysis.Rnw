@@ -246,7 +246,7 @@ label_author_y_n_new =  data%>%
 \section{Introduction}
 
 In this report the statistical analyses of the article \textit{"The effects of educational video-games on students motivation to math: A meta-analysis
-in K-12"} are presented. The aim of the meta-analysis was to synthesized results of the studies concerning the impact of educational video-games on students’ motivation towards mathematics.
+in K-12"} are presented. The aim of the meta-analysis was to synthesize the results of the studies in the literature, concerning the impact of educational video-games on students’ motivation towards mathematics.
 
 Here, we will focus only on the statistical analysis. For theoretical aspects, study selection, and results interpretation the reader can refer directly to the article.
 

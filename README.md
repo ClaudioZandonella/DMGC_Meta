@@ -1,9 +1,9 @@
-# Supplemantal Material of “The effects of educational video-games on students motivation to math: A meta-analysis in K-12”
+# Supplemental material of tha article “The effects of educational video-games on students motivation to math: A meta-analysis in K-12”.
 
 
 ### Summary
 
-This repository contains all the supplemantal material  and the analysis scripts used for the article *“The effects of educational video-games on students motivation to math: A meta-analysis in K-12”*.
+This repository contains all the supplemantal material and the analysis scripts used in the article *“The effects of educational video-games on students motivation to math: A meta-analysis in K-12”*. The aim of the meta-analysis was to synthesize the results of the studies in the literature, concerning the impact of educational video-games on students’ motivation towards mathematics.
 
 ### Analysis reproducibility
 
