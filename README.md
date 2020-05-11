@@ -1,4 +1,4 @@
-# Supplemental material of tha article “The effects of educational video-games on students motivation to math: A meta-analysis in K-12”
+# The effects of educational video-games on students motivation to math: A meta-analysis in K-12 - Supplemental Materials
 
 
 ### Summary
