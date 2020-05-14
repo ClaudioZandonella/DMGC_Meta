@@ -48,6 +48,12 @@
    
 \textstreach
 
+%-----    No authors    ----%
+
+% 0 = Remove authors for reviewers 
+% 1 = Keep authors
+\def\printauthors{0}
+
 %----    Todo    -----%
 \newcommand{\todo}[1]{(\textcolor{red}{Todo: #1})}
 %---------------
@@ -55,7 +61,6 @@
 \let\pgfimageWithoutPath\pgfimage 
 \renewcommand{\pgfimage}[2][]{\pgfimageWithoutPath[#1]{figure/#2}}
 %---------------
-
 
 %%%%%%%%%%%%%%%%%%%%%%          Settings        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -202,20 +207,34 @@ label_author_y_n_new =  data%>%
 	\vspace*{2cm}
 	{\huge \bf The effects of educational video-games\linebreak on students motivation to math:\linebreak A meta-analysis in K-12}\\
 	\vspace{1cm}
-	{\Large List authors\par}
-  \vspace{1cm}
-  {List affiliations\par}
-	\vspace{2cm}
-	{\huge\bfseries Analysis Report\par}
-	\vspace{1cm}
-	{\Large\textit{Edited by}}
-	
-	\vspace{1em}
-	{\Large Claudio Zandonella Callegher*}
-	\vfill
-	*e-mail address\par
-	\href{mailto:claudio.zandonella@gmail.com}{claudiozandonella@gmail.com}
 
+
+
+  \if\printauthors1
+  	{\Large Daniela Fadda~$^1$, Giuliano Vivanet~$^1$, Marta Pellegrini~$^2$,\\ \& Claudio Zandonelle Callegher~$^3$\par}
+    \vspace{1cm}
+    {\small
+    $^1$ Dipartimento di Pedagogia,Psicologia, Filosofia - Università di Cagliari\\
+    $^2$ Dipartimento di Formazione, Lingue, Intercultura, Letterature e Psicologia - Università degli Studi di Firenze\\
+    $^3$ Department of Developmental Psychology and Socialisation, University of Padova, Padova, Italy\par}
+  	\vspace{2cm}
+  	{\huge\bfseries Analysis Report\par}
+  	\vspace{1cm}
+  	{\Large\textit{Edited by}}
+  	\vspace{1em}
+  	
+  	{\Large Claudio Zandonella Callegher*}
+  	\vfill
+  	*e-mail address\par
+  	\href{mailto:claudio.zandonella@gmail.com}{claudiozandonella@gmail.com}
+  \else
+    \vfill
+    {\huge\bfseries Analysis Report\par}
+    \vfill
+  \fi
+
+  
+	
 	\vfill
 
 % Bottom of the page
@@ -366,7 +385,7 @@ Finally, the role of possible moderators is examined using mixed-effects meta-re
 %------------------------
 \subsection{Analysis reproducibility}
 
-To guarantee the reproducibility of the results, the whole analysis is structured within an \textit{R-project} named \texttt{DMGC\_Meta.Rproj} that is possible to download from this repository \todo{add repository link}.
+To guarantee the reproducibility of the results, the whole analysis is structured within an \textit{R-project} named \texttt{DMGC\_Meta.Rproj} that is possible to download from the repository: \url{https://osf.io/bs49d/?view_only=15d32b21828c4a5da2b558b27a048354}.
 
 The R-package \texttt{drake} \parencite{landauDrakePackagePipeline2018} is used to manage the analysis workflow and to enhance the readability and transparency of the analysis. To know more about \texttt{drake} consider the official Git-hub page (\url{https://github.com/ropensci/drake}) or the user manual(\url{https://books.ropensci.org/drake/}). Summarizing, using \texttt{drake} the code of the analysis is organized into different scripts. The user defines the plan of the analysis where each step in the analysis is defined trough functions. Functions can be appropriately defined to obtain desired targets (i.e., R-output with results of interests) and they are declared in another script. Subsequently, \texttt{drake} manages the whole analysis recognizing the dependency structure of the different targets. When any change is made to the code \texttt{drake} evaluates the analysis and updates the results. Using functions to define each step of the analysis allows to avoid "\textit{coping and paste}" in the code, it makes debugging easier, and it facilitates the reading of the code.
 
@@ -377,7 +396,7 @@ Finally, git version control was used to track the changes during the analysis.
 %-------------
 \subsubsection{R-project structure}
 
-The R-project \texttt{DMGC\_Meta.Rproj} is organized into different folders. In the folder \texttt{Data/}, the raw datasets with the information regarding the studies selected in the literature review are stored.
+All the material is collected within \texttt{DMGC\_Meta/}. The R-project \texttt{DMGC\_Meta.Rproj} is organized into different folders. In the folder \texttt{Data/}, the raw datasets with the information regarding the studies selected in the literature review are stored.
 
 In the folder \texttt{R/}, the R-scripts used in the analysis are stored. Using the \texttt{drake} package the analysis is organized into different R-scripts files:
 \begin{itemize}
@@ -393,7 +412,7 @@ In the folder \texttt{Documents/}, it is possible to find the material used to c
 %-------------
 \subsubsection{Run the Analysis}
 
-To run the analysis you can follow two options: \textbf{A)} recreate a more reproducible enviroment using the same R version and packages versions; \textbf{B)} install the required packages and run the analysis.
+Download the whole \texttt{DMGC\_Meta/} folder from the repository (link: \url{https://osf.io/bs49d/?view_only=15d32b21828c4a5da2b558b27a048354}). To run the analysis you can follow two options: \textbf{A)} recreate a more reproducible enviroment using the same R version and packages versions; \textbf{B)} install the required packages and run the analysis.
 
 \paragraph{Option A: reproducible enviroment using \texttt{renv}.}
 
