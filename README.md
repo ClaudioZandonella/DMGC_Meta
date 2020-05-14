@@ -7,7 +7,7 @@ This repository contains all the supplemantal material and the analysis scripts 
 
 ### Analysis reproducibility
 
-To guarantee the reproducibility of the results, the whole analysis is structured within an `R-project` named `DMGC_Meta.Rproj` that is possible to download from this repository <span style="color:red">add repository link</span>.
+To guarantee the reproducibility of the results, the whole analysis is structured within an `R-project` named `DMGC_Meta.Rproj` that is possible to download from this repository https://osf.io/bs49d/?view_only=15d32b21828c4a5da2b558b27a048354.
 
 The R-package`drake` is used to manage the analysis workflow and to enhance the readability and transparency of the analysis. To know more about `drake` consider the [official Git-hub page](https://github.com/ropensci/drake) or the [user manual](https://books.ropensci.org/drake/). Summarizing, using `drake` the code of the analysis is organized into different scripts. The user defines the plan of the analysis where each step in the analysis is defined trough functions. Functions can be appropriately defined to obtain desired targets (i.e., R-output with results of interests) and they are declared in another script. Subsequently, `drake` manages the whole analysis recognizing the dependency structure of the different targets. When any change is made to the code `drake` evaluates the analysis and updates the results. Using functions to define each step of the analysis allows to avoid "*coping and paste*" in the code, it makes debugging easier, and it facilitates the reading of the code.
 
@@ -18,7 +18,7 @@ Finally, git version control was used to track the changes during the analysis.
 
 ### R-project structure
 
-The R-project `DMGC_Meta.Rproj` is organized into different folders. In the folder `Data/`, the raw datasets with the information regarding the studies selected in the literature review are stored.
+All the material is collected within `DMGC_Meta/`. The R-project `DMGC_Meta.Rproj` is organized into different folders. In the folder `Data/`, the raw datasets with the information regarding the studies selected in the literature review are stored.
 
 In the folder `R/`, the R-scripts used in the analysis are stored. Using the `drake` package the analysis is organized into different R-scripts files:
 
@@ -35,7 +35,7 @@ In the folder `Documents/`, it is possible to find the material used to compile 
 ### Run the Analysis
 
 
-To run the analysis you can follow two options: **A)** recreate a more reproducible enviroment using the same R version and packages versions; **B)** install the required packages and run the analysis.
+Download the whole \texttt{DMGC\_Meta/} folder from the repository (link: https://osf.io/bs49d/?view_only=15d32b21828c4a5da2b558b27a048354). To run the analysis you can follow two options: **A)** recreate a more reproducible enviroment using the same R version and packages versions; **B)** install the required packages and run the analysis.
 
 **Option A: reproducible enviroment using `renv`.**
 
