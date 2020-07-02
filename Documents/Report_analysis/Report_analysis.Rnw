@@ -205,18 +205,18 @@ label_author_y_n_new =  data%>%
 
 \centering
 	\vspace*{2cm}
-	{\huge \bf The effects of educational video-games\linebreak on students motivation to math:\linebreak A meta-analysis in K-12}\\
+	{\huge \bf Effects of digital games on student motivation in mathematics: A meta-analysis in K-12}\\
 	\vspace{1cm}
 
 
 
   \if\printauthors1
-  	{\Large Daniela Fadda~$^1$, Giuliano Vivanet~$^1$, Marta Pellegrini~$^2$,\\ \& Claudio Zandonelle Callegher~$^3$\par}
+  	{\Large Daniela Fadda~$^1$, Marta Pellegrini~$^2$, Giuliano Vivanet~$^1$,\\ \& Claudio Zandonella Callegher~$^3$\par}
     \vspace{1cm}
     {\small
-    $^1$ Dipartimento di Pedagogia,Psicologia, Filosofia - Università di Cagliari\\
-    $^2$ Dipartimento di Formazione, Lingue, Intercultura, Letterature e Psicologia - Università degli Studi di Firenze\\
-    $^3$ Department of Developmental Psychology and Socialisation, University of Padova, Padova, Italy\par}
+    $^1$ Department of Education, Psychology and Philosophy, University of Cagliari, Italy\\
+    $^2$ Department of Education, Languages, Intercultures, Literatures and Psychology, University of Florence, Italy\\
+    $^3$ Department of Developmental Psychology and Socialisation, University of Padova, Italy\par}
   	\vspace{2cm}
   	{\huge\bfseries Analysis Report\par}
   	\vspace{1cm}
@@ -412,9 +412,9 @@ In the folder \texttt{Documents/}, it is possible to find the material used to c
 %-------------
 \subsubsection{Run the Analysis}
 
-Download the whole \texttt{DMGC\_Meta/} folder from the repository (link: \url{https://osf.io/bs49d/?view_only=15d32b21828c4a5da2b558b27a048354}). To run the analysis you can follow two options: \textbf{A)} recreate a more reproducible enviroment using the same R version and packages versions; \textbf{B)} install the required packages and run the analysis.
+Download the whole \texttt{DMGC\_Meta/} folder from the repository (link: \url{https://osf.io/bs49d/?view_only=15d32b21828c4a5da2b558b27a048354}). To run the analysis you can follow two options: \textbf{A)} recreate a more reproducible environment using the same R version and packages versions; \textbf{B)} install the required packages and run the analysis.
 
-\paragraph{Option A: reproducible enviroment using \texttt{renv}.}
+\paragraph{Option A: reproducible environment using \texttt{renv}.}
 
 \begin{enumerate}
   \item{Install R version \Sexpr{paste0(c(version$major,".",version$minor), collapse="")} from CRAN and select it as the the R version used in RStudio (more info at \url{https://support.rstudio.com/hc/en-us/articles/200486138-Changing-R-versions-for-RStudio-desktop}).}
