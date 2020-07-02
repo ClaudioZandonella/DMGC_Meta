@@ -3,7 +3,7 @@
 
 ### Summary
 
-This repository contains all the supplemantal material and the analysis scripts used in the article *“The effects of educational video-games on students motivation to math: A meta-analysis in K-12”*. The aim of the meta-analysis was to synthesize the results of the studies in the literature, concerning the impact of educational video-games on students’ motivation towards mathematics.
+This repository contains all the supplemental material and the analysis scripts used in the article *“The effects of educational video-games on students motivation to math: A meta-analysis in K-12”*. The aim of the meta-analysis was to synthesize the results of the studies in the literature, concerning the impact of educational video-games on students’ motivation towards mathematics.
 
 ### Analysis reproducibility
 
@@ -35,9 +35,9 @@ In the folder `Documents/`, it is possible to find the material used to compile 
 ### Run the Analysis
 
 
-Download the whole `DMGC_Meta/` folder from the repository (link: [https://osf.io/bs49d/?view_only=15d32b21828c4a5da2b558b27a048354]). To run the analysis you can follow two options: **A)** recreate a more reproducible enviroment using the same R version and packages versions; **B)** install the required packages and run the analysis.
+Download the whole `DMGC_Meta/` folder from the repository (link: [https://osf.io/bs49d/?view_only=15d32b21828c4a5da2b558b27a048354]). To run the analysis you can follow two options: **A)** recreate a more reproducible environment using the same R version and packages versions; **B)** install the required packages and run the analysis.
 
-**Option A: reproducible enviroment using `renv`.**
+**Option A: reproducible environment using `renv`.**
 
 1.  Install R version 3.6.1 from CRAN and select it as the the R version used in RStudio (more info at this [link](https://support.rstudio.com/hc/en-us/articles/200486138-Changing-R-versions-for-RStudio-desktop).
 2. Make sure you have already the `renv` R-package installed in your library. If not, run the command in R or R-studio `install.packages("renv")`
